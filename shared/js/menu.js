@@ -1,17 +1,17 @@
-// shared/js/menu.js — Menu Sidebar Overlay (Firebase)
+﻿// shared/js/menu.js — Menu Sidebar Overlay (Firebase)
 
 const ALL_MENU_ITEMS = [
     // --- GERAL ---
-    { label: 'Central', link: '/pages/dashboard/dashboard.html', group: 'common', iconKey: 'home' },
-    { label: 'Mapa Mundi', link: '/tools/map.html', group: 'common', iconKey: 'map-zone' },
-    { label: 'Configurações', link: '/pages/config/config.html', group: 'common', iconKey: 'settings' },
+    { label: 'Central', link: 'pages/dashboard/dashboard.html', group: 'common', iconKey: 'home' },
+    { label: 'Mapa Mundi', link: 'tools/map.html', group: 'common', iconKey: 'map-zone' },
+    { label: 'Configurações', link: 'pages/config/config.html', group: 'common', iconKey: 'settings' },
 
     // --- ADMIN ---
-    { label: 'Gerenciar Jogos', link: '/pages/games-panel/games-panel.html', group: 'admin', iconKey: 'gamepad' },
-    { label: 'Glossário (Manual)', link: '/pages/glossary/glossary.html', group: 'admin', iconKey: 'book' },
-    { label: 'Gerador de Jogos', link: '/pages/prompt/prompt.html', group: 'admin', iconKey: 'scroll' },
-    { label: 'Backup e Estrutura', link: '/pages/backup/backup.html', group: 'admin', iconKey: 'box' },
-    { label: 'Contas e Cargos', link: '/pages/accounts/accounts.html', group: 'admin', iconKey: 'users' }
+    { label: 'Gerenciar Jogos', link: 'pages/games-panel/games-panel.html', group: 'admin', iconKey: 'gamepad' },
+    { label: 'Glossário (Manual)', link: 'pages/glossary/glossary.html', group: 'admin', iconKey: 'book' },
+    { label: 'Gerador de Jogos', link: 'pages/prompt/prompt.html', group: 'admin', iconKey: 'scroll' },
+    { label: 'Backup e Estrutura', link: 'pages/backup/backup.html', group: 'admin', iconKey: 'box' },
+    { label: 'Contas e Cargos', link: 'pages/accounts/accounts.html', group: 'admin', iconKey: 'users' }
 ];
 
 async function initMenu() {

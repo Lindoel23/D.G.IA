@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <base href="/D.G.IA/">
+    <script>(function(){var b=document.createElement("base");b.href=location.pathname.indexOf("/D.G.IA/")!==-1?"/D.G.IA/":"/";document.head.prepend(b)})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Manual do Sistema — D.G.IA</title>
+    <title>Manual do Sistema ï¿½ D.G.IA</title>
     <link rel="stylesheet" href="shared/css/global.css">
     <link rel="stylesheet" href="shared/css/components.css">
     <link rel="stylesheet" href="pages/glossary/glossary.css">
@@ -31,16 +31,16 @@
             </div>
         </div>
 
-        <p style="color:#888; margin-bottom:25px;">Guia de comunicação técnica para alinhamento entre Arquiteto (Você) e Engenharia (IA).</p>
+        <p style="color:#888; margin-bottom:25px;">Guia de comunicaï¿½ï¿½o tï¿½cnica para alinhamento entre Arquiteto (Vocï¿½) e Engenharia (IA).</p>
 
-        <!-- SEÇÃO 1: DICIONÁRIO -->
+        <!-- SEï¿½ï¿½O 1: DICIONï¿½RIO -->
         <div class="card">
-            <h3><span data-icon="scroll"></span> Dicionário Tático Atualizado</h3>
+            <h3><span data-icon="scroll"></span> Dicionï¿½rio Tï¿½tico Atualizado</h3>
             <table class="dict-table">
-                <thead><tr><th>Seu Termo</th><th>Tradução para Código</th></tr></thead>
+                <thead><tr><th>Seu Termo</th><th>Traduï¿½ï¿½o para Cï¿½digo</th></tr></thead>
                 <tbody>
                     <tr><td>"Cobrir tudo"</td><td><span class="highlight-tech">position: absolute; inset: 0; z-index: >Parent</span></td></tr>
-                    <tr><td>"Empurrar pro lado"</td><td><span class="highlight-tech">position: relative; display: flex;</span> (Irmãos no fluxo)</td></tr>
+                    <tr><td>"Empurrar pro lado"</td><td><span class="highlight-tech">position: relative; display: flex;</span> (Irmï¿½os no fluxo)</td></tr>
                     <tr><td>"Furar a tela / Vazar"</td><td><span class="highlight-tech">overflow: visible;</span> vs <span class="highlight-tech">overflow: hidden;</span></td></tr>
                     <tr><td>"Separar nas pontas"</td><td><span class="highlight-tech">justify-content: space-between;</span></td></tr>
                     <tr><td>"Colar no topo"</td><td><span class="highlight-tech">align-items: flex-start;</span> ou <span class="highlight-tech">margin-top: 0;</span></td></tr>
@@ -49,7 +49,7 @@
             </table>
         </div>
 
-        <!-- SEÇÃO 2: GRID VISUAL -->
+        <!-- SEï¿½ï¿½O 2: GRID VISUAL -->
         <div class="glossary-grid">
             <div class="glossary-item">
                 <div>
@@ -58,29 +58,29 @@
                     <p class="term-desc">Define a pilha de elementos. Um modal (15000) sempre cobre a Sidebar (12000).</p>
                 </div>
                 <div class="demo-box">
-                    <div class="demo-label">Visualização de Pilha:</div>
+                    <div class="demo-label">Visualizaï¿½ï¿½o de Pilha:</div>
                     <div class="layer-container" id="layerDemo">
                         <div class="layer layer-1">BASE</div>
                         <div class="layer layer-2">HUB</div>
                         <div class="layer layer-3">MODAL</div>
                     </div>
-                    <button class="mini-btn" onclick="document.getElementById('layerDemo').classList.toggle('exploded')" style="width:100%; margin-top:10px;">EXPLODIR VISUALIZAÇÃO</button>
+                    <button class="mini-btn" onclick="document.getElementById('layerDemo').classList.toggle('exploded')" style="width:100%; margin-top:10px;">EXPLODIR VISUALIZAï¿½ï¿½O</button>
                 </div>
             </div>
 
             <div class="glossary-item">
                 <div>
                     <span class="term-title">Flex Alignment</span>
-                    <span class="term-alias">"Arrumação dos itens"</span>
-                    <p class="term-desc">Como distribuímos elementos dentro de um container.</p>
+                    <span class="term-alias">"Arrumaï¿½ï¿½o dos itens"</span>
+                    <p class="term-desc">Como distribuï¿½mos elementos dentro de um container.</p>
                 </div>
                 <div class="demo-box">
-                    <div class="demo-label">Teste Tático:</div>
+                    <div class="demo-label">Teste Tï¿½tico:</div>
                     <div class="flex-container" id="flexDemo">
                         <div class="flex-item"></div><div class="flex-item"></div><div class="flex-item"></div>
                     </div>
                     <div class="flex-controls" style="margin-top:10px;">
-                        <button class="mini-btn" onclick="setFlex('flex-start')">INÍCIO</button>
+                        <button class="mini-btn" onclick="setFlex('flex-start')">INï¿½CIO</button>
                         <button class="mini-btn" onclick="setFlex('center')">CENTRO</button>
                         <button class="mini-btn" onclick="setFlex('space-between')">PONTAS</button>
                     </div>
@@ -91,11 +91,11 @@
                 <div>
                     <span class="term-title">Overlay vs. Relative</span>
                     <span class="term-alias">"Flutuar vs. Empurrar"</span>
-                    <p class="term-desc">Diferença crítica. <strong>Overlay</strong> flutua por cima. <strong>Relative</strong> divide espaço.</p>
+                    <p class="term-desc">Diferenï¿½a crï¿½tica. <strong>Overlay</strong> flutua por cima. <strong>Relative</strong> divide espaï¿½o.</p>
                 </div>
                 <div class="demo-box">
                     <div class="layout-parent">
-                        <div class="layout-content">CONTEÚDO</div>
+                        <div class="layout-content">CONTEï¿½DO</div>
                         <div class="layout-panel" id="layoutPanel">PAINEL</div>
                     </div>
                     <button class="mini-btn" id="layoutBtn" onclick="toggleLayoutMode()" style="width:100%; margin-top:10px;">ALTERNAR MODO (ATUAL: RELATIVE)</button>
@@ -105,8 +105,8 @@
             <div class="glossary-item">
                 <div>
                     <span class="term-title">Height: Auto</span>
-                    <span class="term-alias">"Tamanho Adaptável"</span>
-                    <p class="term-desc">O modal cresce conforme o conteúdo.</p>
+                    <span class="term-alias">"Tamanho Adaptï¿½vel"</span>
+                    <p class="term-desc">O modal cresce conforme o conteï¿½do.</p>
                 </div>
                 <div class="demo-box">
                     <div class="demo-label">Interativo:</div>
@@ -118,7 +118,7 @@
                 <div>
                     <span class="term-title">Toast</span>
                     <span class="term-alias">"Aviso flutuante"</span>
-                    <p class="term-desc">Feedback visual rápido que não bloqueia a tela.</p>
+                    <p class="term-desc">Feedback visual rï¿½pido que nï¿½o bloqueia a tela.</p>
                 </div>
                 <div class="demo-box">
                     <div class="demo-label">Teste:</div>
@@ -133,7 +133,7 @@
                 <div>
                     <span class="term-title">Backdrop Filter</span>
                     <span class="term-alias">"Vidro Fosco"</span>
-                    <p class="term-desc">Separar planos sem perder referência do fundo.</p>
+                    <p class="term-desc">Separar planos sem perder referï¿½ncia do fundo.</p>
                 </div>
                 <div class="demo-box" style="background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%); background-size: 10px 10px;">
                     <div style="width:100%; height:40px; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; border:1px solid #fff; border-radius:4px; font-weight:bold;">

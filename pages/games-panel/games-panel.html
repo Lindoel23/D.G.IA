@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <base href="/D.G.IA/">
+    <script>(function(){var b=document.createElement("base");b.href=location.pathname.indexOf("/D.G.IA/")!==-1?"/D.G.IA/":"/";document.head.prepend(b)})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel de Jogos — D.G.IA</title>
+    <title>Painel de Jogos ï¿½ D.G.IA</title>
     <link rel="stylesheet" href="shared/css/global.css">
     <link rel="stylesheet" href="shared/css/components.css">
     <link rel="stylesheet" href="pages/games-panel/games-panel.css">
@@ -51,13 +51,13 @@
             <input type="hidden" id="editingId" value="">
             <label class="label-small">NOME DO JOGO</label>
             <input type="text" id="gameName" placeholder="Ex: Quiz da Guilda">
-            <label class="label-small">CÓDIGO HTML (VISUAL)</label>
+            <label class="label-small">Cï¿½DIGO HTML (VISUAL)</label>
             <textarea id="gameHtml" placeholder="Cole o HTML do jogo aqui..." style="min-height:200px; font-family: monospace; font-size: 0.8rem;"></textarea>
-            <label class="label-small">CÓDIGO LÓGICA (SERVER - OPCIONAL)</label>
+            <label class="label-small">Cï¿½DIGO Lï¿½GICA (SERVER - OPCIONAL)</label>
             <textarea id="gameLogic" placeholder="Cole o logic.js do jogo aqui..." style="min-height:200px; font-family: monospace; font-size: 0.8rem;"></textarea>
             
             <button class="btn-perm" onclick="openPermissionsHub()">
-                <span data-icon="shield"></span> GERENCIAR PERMISSÕES
+                <span data-icon="shield"></span> GERENCIAR PERMISSï¿½ES
             </button>
 
             <div class="btn-row">
@@ -68,16 +68,16 @@
     </div>
 </div>
 
-<!-- MODAL DE PERMISSÕES -->
+<!-- MODAL DE PERMISSï¿½ES -->
 <div id="permissionsHubModal" class="modal">
     <div class="modal-content">
-        <h3><span data-icon="shield"></span> Permissões de Acesso</h3>
+        <h3><span data-icon="shield"></span> Permissï¿½es de Acesso</h3>
         <p style="color:#888; font-size:0.9rem;">Selecione quem pode ver este jogo.</p>
         
         <h4 style="color:#aaa; margin:15px 0 5px 0; font-size:0.8rem;">POR CARGO:</h4>
         <div id="permRolesList" class="role-select-grid" style="display:flex; flex-direction:column; gap:8px;"></div>
         
-        <h4 style="color:#aaa; margin:15px 0 5px 0; font-size:0.8rem;">POR USUÁRIO:</h4>
+        <h4 style="color:#aaa; margin:15px 0 5px 0; font-size:0.8rem;">POR USUï¿½RIO:</h4>
         <div id="permUsersList" class="role-select-grid" style="display:flex; flex-direction:column; gap:8px;"></div>
 
         <div class="modal-footer">
@@ -86,11 +86,11 @@
     </div>
 </div>
 
-<!-- MODAL DE CONFIRMAÇÃO -->
+<!-- MODAL DE CONFIRMAï¿½ï¿½O -->
 <div id="customConfirmModal" class="modal" style="z-index: 15000;">
     <div class="modal-content" style="max-width: 350px; text-align: center; display: flex; flex-direction: column; align-items: center; padding: 30px 25px;">
         <h3 style="display:flex; flex-direction:column; justify-content:center; align-items:center; color:#ff4444; gap:15px;">
-            <span data-icon="trash"></span> Atenção
+            <span data-icon="trash"></span> Atenï¿½ï¿½o
         </h3>
         <p id="confirmMessage" style="color:#ccc; margin-bottom:25px;">Tem certeza?</p>
         <div class="btn-row" style="width:100%;">
