@@ -1,13 +1,16 @@
-// public/js/icons.js
+// shared/js/icons.js
 
 (function() {
+
+    // Detecta base path automaticamente (Live Server vs GitHub Pages)
+    var _iconBase = location.pathname.indexOf('/D.G.IA/') !== -1 ? '/D.G.IA/' : '/';
 
     // Função que gera a DIV do ícone apontando para o arquivo físico
     window.getIcon = function(name) {
         if (!name) return '';
         // Substitui espaços por underscores por segurança extra
         const safeName = name.trim().replace(/\s+/g, '_');
-        return `<div class="icon-img" style="--url: url('/icons/${safeName}.svg')"></div>`;
+        return `<div class="icon-img" style="--url: url('${_iconBase}icons/${safeName}.svg')"></div>`;
     };
 
     // Renderiza ícones automaticamente baseados no atributo data-icon
@@ -18,7 +21,7 @@
                 const safeName = rawName.trim().replace(/\s+/g, '_');
                 const iconDiv = document.createElement('div');
                 iconDiv.className = 'icon-img';
-                iconDiv.style.setProperty('--url', `url('/icons/${safeName}.svg')`);
+                iconDiv.style.setProperty('--url', `url('${_iconBase}icons/${safeName}.svg')`);
 
                 el.removeAttribute('data-icon'); 
 
