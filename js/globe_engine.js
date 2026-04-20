@@ -2,8 +2,11 @@
 /* MOTOR DO GLOBO 3D D.G.IA — LERP Physics + Câmera Otimizada + SVGs Crosshair */
 
 window.GlobeEngine = (function() {
+    // Base path dinâmico (Live Server vs GitHub Pages)
+    const _base = location.pathname.indexOf('/D.G.IA/') !== -1 ? '/D.G.IA/' : '/';
     let canvas, ctx;
     let width, height, radius;
+    let dpr = window.devicePixelRatio || 1;
     let projection, path;
     let landFeatures = null;
     let allDots = [];
@@ -17,13 +20,13 @@ window.GlobeEngine = (function() {
         safehouse: new Image(),
         ocultista: new Image()
     };
-    icons.exclamation.src = 'icons/exclamation.svg'; 
-    icons.question.src = 'icons/question.svg';
-    icons.tower.src = 'icons/tower.svg';
-    icons.safehouse.src = 'icons/safehouse.svg';
+    icons.exclamation.src = _base + 'icons/exclamation.svg'; 
+    icons.question.src = _base + 'icons/question.svg';
+    icons.tower.src = _base + 'icons/tower.svg';
+    icons.safehouse.src = _base + 'icons/safehouse.svg';
     
     // Carregamento especial para png com tint Vermelho ("como SVG")
-    icons.ocultista.src = 'assets/puzzle.png';
+    icons.ocultista.src = _base + 'assets/puzzle.png';
     let ocultistaTinted = null;
     icons.ocultista.onload = () => {
         const off = document.createElement('canvas');
@@ -430,11 +433,15 @@ window.GlobeEngine = (function() {
     }
 
     function handleResize() {
+        dpr = window.devicePixelRatio || 1;
         width = window.innerWidth;
         height = window.innerHeight;
         radius = Math.min(width, height) / 2.3;
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         
         targetScale = Math.max(radius, Math.min(radius * 4, targetScale));
         
@@ -469,6 +476,7 @@ window.GlobeEngine = (function() {
             canvas = document.getElementById(canvasId);
             ctx = canvas.getContext('2d');
 
+            dpr = window.devicePixelRatio || 1;
             width = window.innerWidth;
             height = window.innerHeight;
             radius = Math.min(width, height) / 2.3;
@@ -478,8 +486,11 @@ window.GlobeEngine = (function() {
             currentRot = [0, -15];
             targetRot = [0, -15];
 
-            canvas.width = width;
-            canvas.height = height;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             projection = d3.geoOrthographic()
                 .scale(currentScale)
