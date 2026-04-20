@@ -321,8 +321,8 @@ window.GlobeEngine = (function() {
             }
 
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             const scale = projection.scale();
             const scaleFactor = scale / radius;
             const hitRadius = 14 * scaleFactor;
@@ -343,8 +343,8 @@ window.GlobeEngine = (function() {
         canvas.addEventListener('mousemove', (e) => {
             if (isDragging || isPicking) return;
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             const scale = projection.scale();
             const scaleFactor = scale / radius;
             const hitRadius = 14 * scaleFactor;
@@ -411,8 +411,8 @@ window.GlobeEngine = (function() {
                 
                 if (e.changedTouches.length === 1 && !isPicking) {
                     const rect = canvas.getBoundingClientRect();
-                    const x = (e.changedTouches[0].clientX - rect.left) * (canvas.width / rect.width);
-                    const y = (e.changedTouches[0].clientY - rect.top) * (canvas.height / rect.height);
+                    const x = e.changedTouches[0].clientX - rect.left;
+                    const y = e.changedTouches[0].clientY - rect.top;
                     const scale = projection.scale();
                     const sf = scale / radius;
                     const hr = 16 * sf;

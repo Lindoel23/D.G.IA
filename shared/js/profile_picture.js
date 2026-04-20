@@ -101,6 +101,8 @@ window.ProfilePicture = {
 
             .pp-actions {
                 display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
                 gap: 12px;
                 margin-top: 25px;
             }
