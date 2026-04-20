@@ -1,10 +1,10 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <base href="/">
+    <base href="/D.G.IA/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Painel de Jogos ‚Äî D.G.IA</title>
+    <title>Painel de Jogos ó D.G.IA</title>
     <link rel="stylesheet" href="shared/css/global.css">
     <link rel="stylesheet" href="shared/css/components.css">
     <link rel="stylesheet" href="pages/games-panel/games-panel.css">
@@ -51,13 +51,13 @@
             <input type="hidden" id="editingId" value="">
             <label class="label-small">NOME DO JOGO</label>
             <input type="text" id="gameName" placeholder="Ex: Quiz da Guilda">
-            <label class="label-small">C√ìDIGO HTML (VISUAL)</label>
+            <label class="label-small">C”DIGO HTML (VISUAL)</label>
             <textarea id="gameHtml" placeholder="Cole o HTML do jogo aqui..." style="min-height:200px; font-family: monospace; font-size: 0.8rem;"></textarea>
-            <label class="label-small">C√ìDIGO L√ìGICA (SERVER - OPCIONAL)</label>
+            <label class="label-small">C”DIGO L”GICA (SERVER - OPCIONAL)</label>
             <textarea id="gameLogic" placeholder="Cole o logic.js do jogo aqui..." style="min-height:200px; font-family: monospace; font-size: 0.8rem;"></textarea>
             
             <button class="btn-perm" onclick="openPermissionsHub()">
-                <span data-icon="shield"></span> GERENCIAR PERMISS√ïES
+                <span data-icon="shield"></span> GERENCIAR PERMISS’ES
             </button>
 
             <div class="btn-row">
@@ -68,16 +68,16 @@
     </div>
 </div>
 
-<!-- MODAL DE PERMISS√ïES -->
+<!-- MODAL DE PERMISS’ES -->
 <div id="permissionsHubModal" class="modal">
     <div class="modal-content">
-        <h3><span data-icon="shield"></span> Permiss√µes de Acesso</h3>
+        <h3><span data-icon="shield"></span> Permissıes de Acesso</h3>
         <p style="color:#888; font-size:0.9rem;">Selecione quem pode ver este jogo.</p>
         
         <h4 style="color:#aaa; margin:15px 0 5px 0; font-size:0.8rem;">POR CARGO:</h4>
         <div id="permRolesList" class="role-select-grid" style="display:flex; flex-direction:column; gap:8px;"></div>
         
-        <h4 style="color:#aaa; margin:15px 0 5px 0; font-size:0.8rem;">POR USU√ÅRIO:</h4>
+        <h4 style="color:#aaa; margin:15px 0 5px 0; font-size:0.8rem;">POR USU¡RIO:</h4>
         <div id="permUsersList" class="role-select-grid" style="display:flex; flex-direction:column; gap:8px;"></div>
 
         <div class="modal-footer">
@@ -86,11 +86,11 @@
     </div>
 </div>
 
-<!-- MODAL DE CONFIRMA√á√ÉO -->
+<!-- MODAL DE CONFIRMA«√O -->
 <div id="customConfirmModal" class="modal" style="z-index: 15000;">
     <div class="modal-content" style="max-width: 350px; text-align: center; display: flex; flex-direction: column; align-items: center; padding: 30px 25px;">
         <h3 style="display:flex; flex-direction:column; justify-content:center; align-items:center; color:#ff4444; gap:15px;">
-            <span data-icon="trash"></span> Aten√ß√£o
+            <span data-icon="trash"></span> AtenÁ„o
         </h3>
         <p id="confirmMessage" style="color:#ccc; margin-bottom:25px;">Tem certeza?</p>
         <div class="btn-row" style="width:100%;">
