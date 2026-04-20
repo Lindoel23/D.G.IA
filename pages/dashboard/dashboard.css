@@ -1,0 +1,32 @@
+/* --- pages/dashboard/dashboard.css --- */
+
+.welcome-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0 50px 0;
+    text-align: center;
+    width: 100%;
+}
+
+.welcome-box h3 {
+    font-size: 2.2rem;
+    color: var(--text-color);
+    text-shadow: none; /* Brilho removido do texto */
+    animation: float_welcome 4s ease-in-out infinite;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Aplicando o brilho neon potente na mão */
+.welcome-box h3 .hand-container .icon-img {
+    filter: drop-shadow(0 0 25px var(--accent-color));
+}
+
+@keyframes float_welcome {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}

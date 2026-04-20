@@ -1,0 +1,391 @@
+/* --- public/shared/css/global.css --- */
+/* Reset, variáveis, layout base, sistema de ícones, títulos, header, menu sidebar, loader, toast */
+
+/* 1. VARIÁVEIS E RESET */
+:root {
+    --bg-color: #1a1a1a;
+    --card-bg: #252525;
+    --text-color: #ffffff;
+    --accent-color: #00ff88;
+}
+
+* { 
+    box-sizing: border-box; 
+    scroll-behavior: smooth; /* Garante rolagem suave para qualquer elemento rolável */
+}
+
+/* --- SCROLLBAR CUSTOMIZADO (Todos os navegadores WebKit/Chromium) --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+}
+::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--accent-color) 60%, transparent);
+    border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+/* Para Firefox Firefox 64+ */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--accent-color) 60%, transparent) rgba(0, 0, 0, 0.3);
+}
+
+html { scroll-behavior: smooth; }
+
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    background-color: var(--bg-color); 
+    color: var(--text-color); 
+    margin: 0; padding: 0; 
+    display: flex; flex-direction: column; 
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    
+    /* Previne flashes escondendo fisicamente até estar .page-ready */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), visibility 0s 0s;
+    will-change: opacity, visibility;
+}
+
+body.page-ready {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.container { 
+    width: 100vw; 
+    max-width: 100%; 
+    margin: 0;
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    flex: 1; 
+    overflow: visible;
+}
+
+/* 2. SISTEMA DE ÍCONES (MASK) */
+.icon-img {
+    display: inline-block;
+    width: 24px; height: 24px; min-width: 24px;
+    -webkit-mask-image: var(--url); mask-image: var(--url);
+    -webkit-mask-size: contain; mask-size: contain;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: center; mask-position: center;
+    background-color: currentColor; 
+    vertical-align: middle;
+    margin-right: 8px;
+    transition: background-color 0.3s, filter 0.3s;
+}
+
+/* 3. TÍTULOS E NEONS */
+h1, h2, h3 { display: flex; align-items: center; gap: 10px; margin-top: 0; line-height: 1.2; }
+
+h1 { 
+    font-size: 1.8rem; 
+    color: var(--accent-color); 
+    text-shadow: 0 0 15px var(--accent-color); 
+}
+h1 .icon-img { 
+    width: 32px; height: 32px; 
+    background-color: var(--accent-color);
+    filter: drop-shadow(0 0 8px var(--accent-color)); 
+}
+h3 .icon-img { width: 24px; height: 24px; background-color: var(--accent-color); }
+
+/* 4. HEADER & MENU TRIGGER */
+.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%; flex-wrap: wrap; gap: 15px; }
+.title-group { display: flex; align-items: center; gap: 15px; position: relative; }
+
+.menu-btn { 
+    background: var(--card-bg); color: var(--text-color); 
+    width: 45px; height: 45px; padding: 0; 
+    border: 1px solid #444; border-radius: 8px; cursor: pointer; transition: 0.2s; 
+    display: flex; justify-content: center; align-items: center; 
+}
+.menu-btn .icon-img { width: 28px; height: 28px; margin: 0; background-color: var(--text-color); }
+
+.menu-btn:hover { 
+    border-color: var(--accent-color); 
+    color: var(--accent-color); 
+    box-shadow: 0 0 15px var(--accent-color); 
+}
+.menu-btn:hover .icon-img { 
+    background-color: var(--accent-color); 
+    filter: drop-shadow(0 0 5px var(--accent-color)); 
+}
+
+/* 5. MENU SIDEBAR OVERLAY */
+.menu-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 19998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    backdrop-filter: blur(3px);
+}
+.menu-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.menu-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 100vh;
+    background: var(--card-bg);
+    border-right: 2px solid var(--accent-color);
+    z-index: 19999;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 0 rgba(0,0,0,0); /* Sombra desligada ao fechar */
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.menu-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 20px 0 60px rgba(0,0,0,0.9); /* Sombra liga apenas quando abre */
+}
+
+/* Botão Fechar do Menu Sidebar */
+.menu-sidebar-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    cursor: pointer;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #ccc;
+    padding: 0;
+    backdrop-filter: blur(4px);
+}
+.menu-sidebar-close:hover {
+    transform: scale(1.1);
+    color: var(--accent-color);
+    background: rgba(0,0,0,0.8);
+    border-color: var(--accent-color);
+}
+.menu-sidebar-close .icon-img {
+    background-color: currentColor;
+    margin: 0;
+    width: 22px;
+    height: 22px;
+}
+
+/* Perfil no Menu Sidebar (Estilo Banner) */
+.menu-profile-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 180px;
+    padding: 20px;
+    border-bottom: 2px solid var(--accent-color);
+    background-color: #111;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+.menu-profile-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.7) 100%);
+    z-index: 1;
+}
+
+.menu-profile-default-icon {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    opacity: 0.15;
+}
+.menu-profile-default-icon .icon-img {
+    width: 80px; height: 80px; background-color: #fff;
+}
+
+.menu-profile-name {
+    position: relative;
+    z-index: 2;
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: var(--accent-color);
+    text-shadow: 0 2px 5px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8);
+    letter-spacing: 0.5px;
+}
+
+/* Links do Menu Sidebar */
+.menu-sidebar-items {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    overflow-y: auto;
+}
+
+.menu-sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 25px;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+.menu-sidebar-item .icon-img {
+    width: 20px;
+    height: 20px;
+    margin-right: 14px;
+    background-color: currentColor;
+    flex-shrink: 0;
+}
+
+.menu-sidebar-item:hover {
+    background: rgba(255,255,255,0.04);
+    color: var(--accent-color);
+    border-left-color: var(--accent-color);
+    padding-left: 30px;
+    text-shadow: 0 0 8px var(--accent-color);
+}
+.menu-sidebar-item:hover .icon-img {
+    background-color: var(--accent-color);
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+/* Separador ADM */
+.menu-sidebar-separator {
+    color: #555;
+    font-size: 0.7rem;
+    text-align: center;
+    padding: 12px 0 6px 0;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Logout (último item) */
+.menu-sidebar-item.logout-item {
+    color: #ff4444;
+    border-top: 1px solid #333;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+.menu-sidebar-item.logout-item:hover {
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.08);
+    border-left-color: #ff4444;
+    text-shadow: 0 0 15px #ff4444;
+}
+.menu-sidebar-item.logout-item:hover .icon-img {
+    background-color: #ff4444;
+    filter: drop-shadow(0 0 8px #ff4444);
+}
+
+/* 6. HAND WAVE */
+.hand-container { display: inline-block; width: 45px; height: 45px; margin-left: 10px; color: var(--accent-color); }
+.hand-container .icon-img { 
+    width: 100%; height: 100%; background-color: var(--accent-color); 
+    filter: drop-shadow(0 0 5px var(--accent-color)); 
+    transform-origin: 70% 70%; animation: wave 2.5s infinite ease-in-out; 
+}
+@keyframes wave { 0% { transform: rotate(0deg); } 20% { transform: rotate(-8deg); } 40% { transform: rotate(14deg); } 60% { transform: rotate(-4deg); } 80% { transform: rotate(10deg); } 100% { transform: rotate(0deg); } }
+
+/* 7. FEEDBACK (TOAST) */
+#toast, #configToast { visibility: hidden; min-width: 250px; background: var(--card-bg); color: var(--accent-color); text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 30000; left: 50%; bottom: 30px; transform: translateX(-50%); border: 1px solid var(--accent-color); opacity: 0; transition: 0.3s; font-weight: bold; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+#configToast.show, #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+/* 8. LOADING CINEMÁTICO (SPA FEEL) - ACELERAÇÃO DE HARDWARE */
+.page-transition-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: var(--bg-color, #1a1a1a);
+    z-index: 999999;
+    display: flex; justify-content: center; align-items: center;
+    opacity: 1; pointer-events: auto;
+    transition: opacity 0.35s ease-out;
+    backdrop-filter: blur(8px);
+    will-change: opacity;
+    transform: translateZ(0); /* Aceleração de Hardware */
+}
+.page-transition-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.page-transition-spinner {
+    width: 65px; height: 65px;
+    border: 3px solid rgba(255, 255, 255, 0.05);
+    border-top: 3px solid var(--accent-color);
+    border-radius: 50%;
+    animation: spin-gpu 1s linear infinite;
+    filter: drop-shadow(0 0 15px var(--accent-color));
+    will-change: transform;
+}
+/* Keyframe rodando solto na GPU, nunca engasga */
+@keyframes spin-gpu { 
+    0% { transform: rotate(0deg) translateZ(0); } 
+    100% { transform: rotate(360deg) translateZ(0); } 
+}
+
+/* 9. RESPONSIVIDADE GLOBAL */
+@media (max-width: 768px) {
+    .container {
+        padding: 12px;
+    }
+    h1 {
+        font-size: 1.4rem;
+    }
+    .header-row {
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+    .menu-sidebar {
+        width: 100vw;
+        border-right: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 8px;
+    }
+    h1 {
+        font-size: 1.2rem;
+    }
+    h1 .icon-img {
+        width: 24px;
+        height: 24px;
+    }
+    .menu-btn {
+        width: 40px;
+        height: 40px;
+    }
+    .menu-btn .icon-img {
+        width: 22px;
+        height: 22px;
+    }
+}

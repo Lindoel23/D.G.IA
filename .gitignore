@@ -1,0 +1,23 @@
+# Dependências
+node_modules/
+package-lock.json
+
+# Dados locais (migrados pro Firebase)
+data/
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Replit
+.replit
+.agents/
+.local/
+
+# Scripts de migração (temporários)
+scripts/

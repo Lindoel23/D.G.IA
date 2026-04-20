@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Configurações</title>
+    <link rel="stylesheet" href="shared/css/global.css">
+    <link rel="stylesheet" href="shared/css/components.css">
+    <link rel="stylesheet" href="pages/config/config.css">
+        <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="firebase/config.js"></script>
+    <script src="firebase/auth.js"></script>
+    <script src="firebase/accounts.js"></script>
+    <script src="firebase/roles.js"></script>
+    <script src="firebase/missions.js"></script>
+<script src="shared/js/theme.js"></script>
+    <script src="shared/js/icons.js"></script>
+    <script src="shared/js/menu.js"></script>
+    <script src="shared/js/loader.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header-row">
+            <div class="title-group">
+                <button id="menuTrigger" class="menu-btn" data-icon="menu"></button>
+                <h1><span data-icon="settings"></span> Configurações</h1>
+            </div>
+        </div>
+
+        <div id="configToast">Mensagem aqui</div>
+
+        <!-- CARD: MINHA CONTA -->
+        <div class="card" style="position: relative; padding-bottom: 25px;">
+            
+            <div style="display:flex; flex-direction: column; align-items:center; text-align:center; padding-bottom: 20px; border-bottom: 1px solid #333; margin-bottom: 20px;">
+                <div id="configProfilePic" class="config-profile-bg" onclick="window.ProfilePicture.previewModal(document.getElementById('configProfilePic').dataset.currentImage || null)" title="Alterar foto de perfil">
+                    <div class="pp-default-icon"><span data-icon="user"></span></div>
+                    <div class="pp-edit-overlay"><span data-icon="edit"></span> MUDAR</div>
+                </div>
+                <h3><span data-icon="user"></span> Minha Conta</h3>
+                <p>Atualize seus dados de acesso.</p>
+                <div id="myRolesDisplay" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px;"></div>
+            </div>
+
+            <label class="label-small">Apelido</label>
+            <input type="text" id="accNick" placeholder="Carregando...">
+            <label class="label-small">Email</label>
+            <input type="text" id="accEmail" placeholder="Carregando...">
+            <label class="label-small">Senha</label>
+            <div class="password-wrapper">
+                <input type="password" id="accPass" placeholder="Nova Senha (opcional)">
+                <button class="toggle-pass" onclick="toggleConfigPass()" type="button" tabindex="-1">
+                    <span data-icon="eye_off"></span>
+                </button>
+            </div>
+            
+            <button id="btnUpdateAccount" class="btn-full" onclick="saveAccountData()">ATUALIZAR CONTA</button>
+            <input type="hidden" id="configProfilePos" value="50,50">
+        </div>
+
+        <!-- CARD: PALETA DE CORES -->
+        <div class="card">
+            <h3><span data-icon="palette"></span> Paleta de Cores</h3>
+            <p>Personalize a aparência do sistema.</p>
+            <div class="color-row"><span class="color-label">Destaque</span><div id="preview-primary" class="current-color-box" onclick="openPicker('primary')"></div></div>
+            <div class="color-row"><span class="color-label">Fundo da Tela</span><div id="preview-background" class="current-color-box" onclick="openPicker('background')"></div></div>
+            <div class="color-row"><span class="color-label">Fundo dos Cartões</span><div id="preview-card" class="current-color-box" onclick="openPicker('card')"></div></div>
+            <div class="color-row"><span class="color-label">Texto Principal</span><div id="preview-text" class="current-color-box" onclick="openPicker('text')"></div></div>
+            <button id="btnSaveTheme" class="btn-full" onclick="saveAllSettings()">SALVAR TEMA GERAL</button>
+            <button class="btn-reset" onclick="openResetModal()">RESTAURAR PADRÃO</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE COR -->
+    <div id="colorModal" class="modal">
+        <div class="modal-content modal-mini">
+            <h3 style="justify-content:center;">Escolha a Cor</h3>
+            <div class="swatch-grid">
+                <div class="swatch" style="background:#00ff88" onclick="selectSwatchAndClose('#00ff88')"></div>
+                <div class="swatch" style="background:#4488ff" onclick="selectSwatchAndClose('#4488ff')"></div>
+                <div class="swatch" style="background:#ff4444" onclick="selectSwatchAndClose('#ff4444')"></div>
+                <div class="swatch" style="background:#e056fd" onclick="selectSwatchAndClose('#e056fd')"></div>
+                <div class="swatch" style="background:#f1c40f" onclick="selectSwatchAndClose('#f1c40f')"></div>
+                <div class="swatch" style="background:#ffffff" onclick="selectSwatchAndClose('#ffffff')"></div>
+                <div class="swatch" style="background:#1a1a1a" onclick="selectSwatchAndClose('#1a1a1a')"></div>
+                <div class="swatch" style="background:#252525" onclick="selectSwatchAndClose('#252525')"></div>
+                <div class="swatch" style="background:#000000" onclick="selectSwatchAndClose('#000000')"></div>
+                <div class="swatch swatch-plus" title="Seletor nativo">
+                    <span data-icon="plus"></span>
+                    <input type="color" id="nativePicker" oninput="updatePreviewOnly(this.value)">
+                </div>
+            </div>
+            <input type="text" id="hexInput" class="hex-input" placeholder="#000000" oninput="updateFromText(this.value)">
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closePicker()">CANCELAR</button>
+                <button class="btn-play" onclick="confirmColor()">CONFIRMAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RESET -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content" style="max-width:320px; text-align:center; display:flex; flex-direction:column; align-items:center; padding:30px 25px;">
+            <h3 style="justify-content:center; color:#ff4444; flex-direction:column; gap:15px;">
+                <span data-icon="trash"></span> Restaurar?
+            </h3>
+            <p style="color:#ccc; margin-bottom:25px;">Isso vai apagar suas cores e voltar para o tema original.</p>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeResetModal()">CANCELAR</button>
+                <button class="btn-danger" onclick="confirmReset()">SIM, RESTAURAR</button>
+            </div>
+        </div>
+    </div>
+<script src="shared/js/api-helpers.js"></script>
+    <script src="shared/js/toast.js"></script>
+    <script src="shared/js/profile_picture.js"></script>
+    <script src="/pages/config/config.js"></script>
+</body>
+</html>

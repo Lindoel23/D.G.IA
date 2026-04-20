@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Registro — D.G.IA</title>
+    <link rel="stylesheet" href="shared/css/global.css">
+    <link rel="stylesheet" href="shared/css/auth.css">
+    <link rel="stylesheet" href="pages/register/register.css">
+    <script src="shared/js/theme.js"></script>
+    <script src="shared/js/icons.js"></script>
+    <script src="shared/js/loader.js"></script>
+</head>
+<body>
+    <div class="logo-container"><div class="logo">D.G.IA</div></div>
+
+    <div class="login-card card">
+        <p class="subtitle">Criar Nova Conta</p>
+        <div class="input-group">
+            <input class="auth-input" type="text" id="regNick" placeholder="Apelido">
+        </div>
+        <div class="input-group">
+            <input class="auth-input" type="email" id="regEmail" placeholder="Email">
+        </div>
+        <div class="input-group">
+            <input class="auth-input" type="password" id="regPass" placeholder="Senha" onkeyup="if(event.key==='Enter') doRegister()">
+            <button class="auth-toggle-pass" id="btnEyeRegister" onclick="toggleRegisterPass()" type="button">
+                <span data-icon="eye_off"></span>
+            </button>
+        </div>
+        <button class="btn-auth" onclick="doRegister()">REGISTRAR</button>
+        <div class="divider"><span>OU</span></div>
+        <div class="footer-container">
+            <div class="garfield-wrapper">
+                <img src="assets/garfield.gif" alt="Garfield" class="garfield-homenagem">
+            </div>
+            <div class="footer-text">
+                <a href="pages/login/login.html" class="link-back">VOLTAR AO LOGIN</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="errorToast">Erro</div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="firebase/config.js"></script>
+    <script src="firebase/auth.js"></script>
+    <script src="firebase/accounts.js"></script>
+
+    <script src="pages/register/register.js"></script>
+</body>
+</html>

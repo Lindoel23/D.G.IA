@@ -1,0 +1,357 @@
+/* --- public/css/map.css --- */
+/* ESTILOS DO GLOBO 3D D.G.IA - FULL BLEED e Sidebar Otimizada */
+
+/* ===== LAYOUT PRINCIPAL ===== */
+html, body { 
+    height: 100vh; 
+    width: 100vw;
+    overflow: hidden; 
+    background: var(--bg-color); 
+    margin: 0; 
+    padding: 0;
+}
+
+.map-container { 
+    height: 100vh; 
+    width: 100vw;
+    position: relative; 
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* ===== ELEMENTOS FLUTUANTES (UI) ===== */
+.header-row { 
+    position: absolute;
+    top: 20px; 
+    left: 20px; 
+    right: 20px; 
+    z-index: 11000; 
+    transition: opacity 0.3s ease; 
+    pointer-events: none; /* Deixa rodar o globo por trás se não clicar nos botões */
+}
+
+.header-row > * {
+    pointer-events: auto; /* Reativa clique nos botões/títulos reais */
+}
+
+/* Gatilho da Sidebar */
+.mission-trigger { 
+    position: fixed; 
+    right: 30px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    width: 50px; 
+    height: 50px; 
+    background: var(--card-bg); 
+    border: 1px solid #444; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    z-index: 11000; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+.mission-trigger .icon-img { 
+    margin: 0 !important; 
+    width: 26px; 
+    height: 26px; 
+    background-color: #fff; 
+}
+
+.mission-trigger:hover { 
+    border-color: var(--accent-color); 
+    box-shadow: 0 0 15px var(--accent-color); 
+}
+
+/* ===== VIEWPORT DO GLOBO ===== */
+#globe-viewport { 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    overflow: hidden; 
+}
+
+#globeCanvas { 
+    cursor: grab; 
+    background: transparent;
+    touch-action: none;
+}
+
+#globeCanvas:active { 
+    cursor: grabbing; 
+}
+
+/* ===== SIDEBAR DE MISSÕES ===== */
+#mission-sidebar { 
+    position: fixed; 
+    top: 0; 
+    right: 0; /* Ancorado à direita */
+    width: 400px; 
+    height: 100vh; 
+    background: var(--card-bg); 
+    border-left: 2px solid var(--accent-color); 
+    z-index: 12000; 
+    /* Usa TransformX para performance nativa de GPU e zero conflito de margens */
+    transform: translateX(100%); 
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+    padding: 0; 
+    display: flex; 
+    flex-direction: column; 
+    box-shadow: -20px 0 60px rgba(0,0,0,0.9); 
+    box-sizing: border-box;
+}
+
+#mission-sidebar.open { 
+    transform: translateX(0); 
+}
+
+#mission-content-area { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    position: relative; 
+    overflow: hidden; 
+    padding: 10px 0 0 0; 
+}
+
+/* Botão Fechar Sidebar */
+.btn-close-sidebar { 
+    cursor: pointer; 
+    width: 40px; 
+    height: 40px; 
+    margin-bottom: 0px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    transition: transform 0.2s; 
+    align-self: flex-start;
+    margin-left: 15px; 
+    margin-top: 15px; 
+    z-index: 12050; /* Assegura clicabilidade */
+}
+
+.btn-close-sidebar:hover { 
+    transform: translateX(5px); 
+}
+
+.btn-close-sidebar .icon-img { 
+    background-color: var(--accent-color); 
+    margin: 0; 
+    width: 24px; 
+    height: 24px; 
+}
+
+/* ===== PICKING UI ===== */
+#picking-actions { 
+    position: fixed; 
+    top: 30px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 16000; 
+    background: rgba(15,15,15,0.95); 
+    padding: 15px 30px; 
+    border-radius: 50px; 
+    border: 1px solid var(--accent-color); 
+    display: none; 
+    gap: 20px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
+    backdrop-filter: blur(10px); 
+}
+
+/* ===== MODAIS ===== */
+.modal { 
+    z-index: 15000; 
+    padding: 0 !important; 
+}
+
+.modal-content { 
+    max-width: 450px; 
+    padding: 25px; 
+    max-height: 85vh; 
+    overflow-y: auto; 
+}
+
+.mission-form input, 
+.mission-form textarea, 
+.mission-form select { 
+    width: 100%; 
+    background: #111; 
+    border: 1px solid #333; 
+    color: #fff; 
+    padding: 10px 12px; 
+    margin-bottom: 10px; 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+    font-family: inherit; 
+    outline: none; 
+}
+
+.mission-form input:focus { 
+    border-color: var(--accent-color); 
+}
+
+.mission-form textarea { 
+    height: 80px; 
+}
+
+.coord-row { 
+    display: flex; 
+    gap: 10px; 
+    margin-bottom: 10px; 
+}
+
+.btn-target { 
+    background: #222; 
+    border: 1px solid #444; 
+    color: #fff; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px; 
+    padding: 0 15px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    height: 45px; 
+    font-weight: bold;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-target:hover { 
+    border-color: var(--accent-color); 
+    color: var(--accent-color); 
+}
+
+.btn-target .icon-img { 
+    width: 20px; 
+    height: 20px; 
+    background-color: currentColor; 
+    margin: 0; 
+}
+
+/* ===== OVERLAY DE STATUS DO GLOBO ===== */
+.globe-overlay { 
+    position: absolute; 
+    bottom: 30px; 
+    left: 20px; 
+    background: rgba(0,0,0,0.6); 
+    padding: 10px 16px; 
+    border-radius: 10px; 
+    border: 1px solid #333; 
+    font-size: 0.75rem; 
+    color: #888; 
+    backdrop-filter: blur(6px);
+    pointer-events: none;
+    z-index: 100;
+}
+
+.globe-overlay .accent { 
+    color: var(--accent-color); 
+    font-weight: bold; 
+}
+
+/* ===== RESPONSIVO: MOBILE ===== */
+@media (max-width: 768px) {
+    .header-row {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .mission-trigger { 
+        right: 10px; 
+        top: 20px; 
+        transform: translateY(0);
+        width: 45px; 
+        height: 45px; 
+        border-radius: 10px;
+    }
+
+    /* O Sidebar usa TranslateX(0) para sumir, então apenas expandimos a width no Mobile */
+    #mission-sidebar { 
+        width: 100vw; 
+        border-left: none;
+        border-right: none;
+    }
+
+    .mission-trigger .icon-img { 
+        width: 22px; 
+        height: 22px; 
+    }
+
+    .globe-overlay {
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.65rem;
+        padding: 8px 12px;
+        white-space: nowrap;
+    }
+
+    #picking-actions {
+        top: auto;
+        bottom: 30px;
+        padding: 12px 20px;
+    }
+
+    .modal-content {
+        max-width: 95vw;
+        margin: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+     h1 {
+        font-size: 1.3rem !important;
+    }
+}
+
+/* ===== TOAST NOTIFICATIONS ===== */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--accent-color);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.error {
+    border-color: #ff4444;
+}
+
+.toast.warning {
+    border-color: #f1c40f;
+}

@@ -1,0 +1,11 @@
+/* --- pages/games-panel/games-panel.css --- */
+
+.role-select-grid { display: flex; flex-direction: column; gap: 8px; }
+
+#view-create textarea {
+    color: #0f0;
+}
+
+.game-card-actions { 
+    display: flex; gap: 8px; margin-top: 10px; 
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gerador de Jogos — D.G.IA</title>
+    <link rel="stylesheet" href="shared/css/global.css">
+    <link rel="stylesheet" href="shared/css/components.css">
+    <link rel="stylesheet" href="pages/prompt/prompt.css">
+    <script src="shared/js/theme.js"></script>
+    <script src="shared/js/icons.js"></script>
+    <script src="shared/js/menu.js"></script>
+    <script src="shared/js/loader.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header-row">
+            <div class="title-group">
+                <button id="menuTrigger" class="menu-btn" data-icon="menu"></button>
+                <h1><span data-icon="scroll"></span> Gerador de Jogos</h1>
+            </div>
+        </div>
+
+        <p id="desc-game" style="text-align: left; margin-bottom: 20px; opacity: 0.8; font-size: 0.9rem;">
+            Use este prompt para pedir à IA que crie novos jogos multiplayer compatíveis com Firebase.
+        </p>
+
+        <textarea id="promptGame" class="prompt-box active" readonly></textarea>
+
+        <button onclick="copyCurrentPrompt()" class="btn-save" id="copyBtn">
+            <span data-icon="copy"></span> COPIAR PROMPT
+        </button>
+
+        <div class="hint">
+            <strong>Como usar:</strong> Copie o prompt, cole em uma IA (ChatGPT, Gemini, etc.), e descreva sua ideia de jogo no final. O código gerado será compatível com o sistema Firebase.
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="firebase/config.js"></script>
+    <script src="firebase/auth.js"></script>
+    <script src="firebase/accounts.js"></script>
+    <script src="firebase/roles.js"></script>
+    <script src="firebase/missions.js"></script>
+
+    <script src="pages/prompt/prompt.js"></script>
+</body>
+</html>

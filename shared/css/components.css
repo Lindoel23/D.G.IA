@@ -1,0 +1,222 @@
+/* --- public/shared/css/components.css --- */
+/* Cards, botões, inputs, modais, password toggle, color picker, search, selection */
+
+/* 1. CARD UNIVERSAL */
+.card {
+    background: var(--card-bg);
+    border: 1px solid #444;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s, box-shadow 0.3s;
+}
+
+.card:hover { 
+    border-color: var(--accent-color); 
+    transform: translateY(-5px); 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5); 
+}
+
+.card h3 { 
+    font-size: 1.4rem; 
+    margin-top: 0; 
+    color: #fff;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.card p { margin: 0; color: #888; font-size: 0.9rem; margin-top: -5px; }
+
+/* 2. INPUTS */
+input[type="text"], input[type="password"], input[type="email"], textarea, select { 
+    width: 100%; background: #111; border: 1px solid #444; color: var(--text-color); 
+    border-radius: 8px; padding: 0 15px; font-size: 1rem; box-sizing: border-box; 
+    outline: none; height: 45px; margin: 0; font-family: inherit;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--accent-color); box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color) 10%, transparent); }
+textarea { min-height: 150px; padding: 15px; height: auto; resize: vertical; }
+
+.label-small { font-size: 0.75rem; color: #888; display: block; text-transform: uppercase; margin-bottom: -10px; margin-left: 2px; z-index: 1; position: relative; }
+
+/* 3. PASSWORD TOGGLE */
+.password-wrapper { position: relative; width: 100%; margin: 0; }
+.password-wrapper input { padding-right: 50px; }
+.toggle-pass { position: absolute; right: 0; top: 0; bottom: 0; width: 50px; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; padding: 0; outline: none; }
+.toggle-pass .icon-img { width: 20px; height: 20px; background-color: #666; margin: 0; transition: background-color 0.3s; }
+.toggle-pass:hover .icon-img { background-color: var(--accent-color); }
+
+/* 4. BOTÕES */
+button, .btn-link, .btn-play, .btn-new, .btn-save, .btn-cancel, .btn-danger, .btn-full {
+    cursor: pointer; border: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+    text-transform: uppercase; letter-spacing: 0.5px; 
+    display: flex; justify-content: center; align-items: center;
+    text-decoration: none; color: #fff;
+    box-sizing: border-box;
+    height: 45px; 
+    padding: 0 20px;
+    border: 1px solid transparent;
+}
+
+.btn-save, .btn-new, .btn-play, .btn-full, .btn-cancel, .btn-danger { width: 100%; }
+
+.btn-save, .btn-new, .btn-play, .btn-full { background: var(--accent-color); color: #000; border-color: var(--accent-color); }
+.btn-save:hover, .btn-new:hover, .btn-play:hover, .btn-full:hover { filter: brightness(1.1); box-shadow: 0 0 15px var(--accent-color); transform: translateY(-3px); }
+
+.btn-cancel, .btn-cancel-edit { background: #333; color: #ccc; border: 1px solid #555; }
+.btn-cancel:hover, .btn-cancel-edit:hover { background: #444; color: #fff; border-color: #fff; }
+
+.btn-danger { background: #ff4444; color: #fff; border: 1px solid #ff4444; }
+.btn-danger:hover { background: #cc0000; box-shadow: 0 0 15px #ff4444; }
+
+.btn-row, .modal-footer, .action-group { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
+.btn-row button, .modal-footer button, .btn-row a, .modal-footer a { flex: 1; margin: 0; width: 100%; }
+
+/* Botões Pequenos (Ícone) */
+.btn-icon { width: 36px; height: 36px; background: #222; border: 1px solid #444; padding: 0; display: flex; justify-content: center; align-items: center; border-radius: 6px; }
+.btn-icon:hover { border-color: #fff; }
+.btn-icon .icon-img { width: 16px; height: 16px; margin: 0; background-color: #fff; }
+
+.btn-danger-icon { width: 36px; height: 36px; background: #ff4444; border: 1px solid #ff4444; padding: 0; display: flex; justify-content: center; align-items: center; border-radius: 6px; }
+.btn-danger-icon:hover { background: #cc0000; }
+.btn-danger-icon .icon-img { width: 16px; height: 16px; margin: 0; background-color: #fff; }
+
+.btn-manage { background: #333; border: 1px solid #555; color: #ddd; padding: 0 10px; border-radius: 5px; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; height: 45px; display: flex; justify-content: center; align-items: center; margin-top: 5px; }
+.btn-manage:hover { border-color: var(--accent-color); color: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
+
+.btn-perm { background: #222; border: 1px solid #444; color: #ccc; padding: 0 10px; height: 45px; border-radius: 5px; width: 100%; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-perm:hover { border-color: var(--accent-color); color: #fff; }
+.btn-perm .icon-img { margin: 0; width: 20px; height: 20px; background-color: currentColor; }
+
+/* 5. LISTAS E GRIDS */
+.project-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; }
+.action-row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+
+/* 6. PERMISSÕES E SELEÇÃO */
+.perm-card { 
+    background: #151515; border: 1px solid #333; padding: 15px; border-radius: 8px; 
+    cursor: pointer; text-align: center; transition: 0.3s; user-select: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60px;
+    font-size: 0.85rem; color: #aaa;
+}
+.perm-card .icon-img { margin-bottom: 8px; width: 24px; height: 24px; margin-right: 0; background-color: #aaa; }
+.perm-card:hover { background: #222; }
+.perm-card.selected { border-color: var(--accent-color); color: var(--accent-color); background: transparent; font-weight: bold; box-shadow: 0 0 10px var(--accent-color); }
+.perm-card.selected .icon-img { background-color: var(--accent-color); filter: drop-shadow(0 0 5px var(--accent-color)); }
+
+.permissions-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+
+/* 7. COLOR PICKER */
+.swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 25px; justify-items: center; }
+.swatch { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+.swatch:hover { transform: scale(1.15); border-color: #fff; }
+.swatch-plus { background: #333; display: flex; justify-content: center; align-items: center; padding: 0; border: 2px dashed #666; position: relative; overflow: hidden; }
+.swatch-plus .icon-img { margin: 0; width: 24px; height: 24px; background-color: #fff; }
+.swatch-plus:hover { border-color: var(--accent-color); }
+.swatch-plus:hover .icon-img { background-color: var(--accent-color); filter: drop-shadow(0 0 5px var(--accent-color)); }
+
+/* 8. SEARCH BAR */
+.search-bar { width: 100%; padding: 12px; background: #000; border: 1px solid #444; border-radius: 6px; color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none; }
+.search-bar:focus { border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
+
+/* 9. SELEÇÃO */
+.summary-card { background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.3s; }
+.summary-card:hover { background: #222; border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
+
+.role-select-btn, .select-item-btn { 
+    padding: 15px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #aaa; 
+    cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; min-height: 50px; 
+}
+.role-select-btn.selected, .select-item-btn.selected { border-color: var(--accent-color); background: color-mix(in srgb, var(--accent-color) 5%, transparent); color: #fff; box-shadow: 0 0 15px color-mix(in srgb, var(--accent-color) 10%, transparent); }
+
+/* 10. MODAIS */
+.modal { 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.9); z-index: 10000;
+    overflow-y: auto; padding: 20px; justify-content: center; align-items: center; 
+}
+#permissionsHubModal { z-index: 16000 !important; }
+#selectionModal { z-index: 16000 !important; }
+#customConfirmModal { z-index: 17000 !important; }
+
+.modal-content { 
+    background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid #444; 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8); width: 100%; max-width: 450px; 
+    height: auto; max-height: 90vh; overflow-y: auto; 
+    display: flex; flex-direction: column; gap: 15px; animation: slideIn 0.3s; margin: 0;
+}
+.modal-mini .modal-content { max-width: 320px; text-align: center; }
+
+@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* 11. TABS */
+.tabs { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
+.tab-btn { 
+    flex: 1; height: 45px; display: flex; align-items: center; justify-content: center; gap: 8px; 
+    padding: 0 10px; background: #333; color: #ccc; border: 1px solid #444;
+    border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 0.9rem; text-transform: uppercase;
+}
+.tab-btn:hover { background: #444; color: #fff; border-color: #666; }
+.tab-btn.active { 
+    background: var(--accent-color); color: #000; border-color: var(--accent-color);
+    box-shadow: 0 0 15px var(--accent-color); 
+}
+.tab-btn .icon-img { margin: 0; width: 20px; height: 20px; background-color: #ccc; }
+.tab-btn:hover .icon-img { background-color: #fff; }
+.tab-btn.active .icon-img { background-color: #000; }
+
+/* 12. RESPONSIVIDADE DE COMPONENTES */
+@media (max-width: 768px) {
+    .card {
+        padding: 18px;
+        border-radius: 12px;
+    }
+    .card h3 {
+        font-size: 1.2rem;
+    }
+    .project-list {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .modal-content {
+        max-width: 95vw;
+        margin: 10px;
+        padding: 20px;
+    }
+    .permissions-container {
+        grid-template-columns: 1fr;
+    }
+    .tabs {
+        gap: 6px;
+    }
+    .tab-btn {
+        font-size: 0.75rem;
+        padding: 0 6px;
+        height: 40px;
+    }
+    .btn-row, .modal-footer {
+        flex-direction: column;
+    }
+    .btn-row button, .modal-footer button {
+        width: 100%;
+    }
+    .swatch-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+    }
+    .swatch {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 15px;
+    }
+    .project-list {
+        gap: 10px;
+    }
+}

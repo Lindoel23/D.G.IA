@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mapa Mundi — D.G.IA</title>
+
+    <link rel="stylesheet" href="shared/css/global.css">
+    <link rel="stylesheet" href="shared/css/components.css">
+    <link rel="stylesheet" href="css/map.css">
+    <link rel="stylesheet" href="css/mission_system.css">
+
+    <!-- Infraestrutura D.G.IA -->
+    <script src="shared/js/theme.js"></script>
+    <script src="shared/js/icons.js"></script>
+    <script src="shared/js/menu.js"></script>
+    <script src="shared/js/loader.js"></script>
+
+    <!-- D3.js para projeção do globo -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Firebase SDK (DEVE carregar ANTES do mission_system) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="firebase/config.js"></script>
+    <script src="firebase/auth.js"></script>
+    <script src="firebase/accounts.js"></script>
+    <script src="firebase/roles.js"></script>
+    <script src="firebase/missions.js"></script>
+
+    <!-- Motor do Globo + Missões -->
+    <script src="js/globe_engine.js"></script>
+    <script src="js/mission_system.js"></script>
+    <script src="js/mission_system/cover_manager.js"></script>
+</head>
+<body>
+
+    <div class="map-container">
+        <!-- HEADER -->
+        <div class="header-row">
+            <div class="title-group">
+                <button id="menuTrigger" class="menu-btn" data-icon="menu"></button>
+                <h1><span data-icon="map-zone"></span> Mapa Mundi</h1>
+            </div>
+        </div>
+        
+        <!-- VIEWPORT DO GLOBO -->
+        <div id="globe-viewport">
+            <canvas id="globeCanvas"></canvas>
+            <div class="globe-overlay" style="pointer-events: auto; display: flex; align-items: center; gap: 10px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span id="game-date-display" class="accent" style="font-size: 1.4rem; font-weight: bold; margin-top: 2px;">...</span>
+                <span id="btn-edit-time" data-icon="edit" style="display:none; cursor:pointer; margin-left:5px; color:#888; font-size: 1.2rem;" onclick="openTimeModal()" title="Editar Tempo"></span>
+            </div>
+        </div>
+
+        <!-- BOTÃO SIDEBAR -->
+        <button class="mission-trigger" onclick="toggleSidebar(true)" title="Ver Objetivos">
+            <span data-icon="scroll"></span>
+        </button>
+    </div>
+
+    <!-- UI DE CONFIRMAÇÃO DE LOCAL (PICKING) -->
+    <div id="picking-actions">
+        <button class="btn-cancel" onclick="cancelPick()" style="width: auto; padding: 0 25px; height: 45px;">CANCELAR</button>
+        <button class="btn-save" onclick="confirmPick()" style="width: auto; padding: 0 25px; height: 45px;">CONFIRMAR LOCAL</button>
+    </div>
+
+    <!-- SIDEBAR DE MISSÕES -->
+    <div id="mission-sidebar">
+        <div style="display:flex; justify-content: space-between; align-items: center; padding-right: 15px; width: 100%; box-sizing: border-box;">
+            <div class="btn-close-sidebar" onclick="toggleSidebar(false)" data-icon="arrow_right" style="margin-right:auto;"></div>
+            <button id="btn-organize-missions" onclick="if(window.MissionSystem) window.MissionSystem.toggleOrganizeMode()" style="background:transparent; border:none; color:#888; cursor:pointer; padding:10px; margin-top:15px; display:flex; align-items:center; justify-content:center; transition:0.2s;" title="Organizar Missões">
+                <span id="organize-icon" data-icon="organize"></span>
+            </button>
+        </div>
+        <div class="mission-filter-bar" style="display:flex; gap:8px; margin-bottom:5px; padding: 5px 20px 0 20px;">
+            <button class="filter-btn active" onclick="if(window.MissionSystem) window.MissionSystem.applyFilter('all')">Todas</button>
+            <button class="filter-btn" onclick="if(window.MissionSystem) window.MissionSystem.applyFilter('public')">Público</button>
+            <button class="filter-btn" onclick="if(window.MissionSystem) window.MissionSystem.applyFilter('individual')">Individual</button>
+            <button class="filter-btn" onclick="if(window.MissionSystem) window.MissionSystem.applyFilter('local')">Local</button>
+        </div>
+        <div id="mission-content-area"></div>
+        <div id="admin-mission-control" style="padding: 15px 25px 25px 25px; border-top: 1px solid #333; display: none;">
+            <button class="btn-save" style="width: 100%; height: 40px; font-size: 0.8rem;" onclick="openMissionCreateModal()">
+                <span data-icon="plus"></span> NOVA MISSÃO
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL CRIAÇÃO DE MISSÃO -->
+    <div id="missionModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0;"><span data-icon="plus"></span> Nova Missão</h2>
+            <div class="mission-form">
+                <div class="mission-cover-preview" id="m-cover-preview" onclick="if(window.MissionCover)window.MissionCover.openModal('create')">
+                    <span><span data-icon="image"></span> ADICIONAR CAPA</span>
+                </div>
+                <input type="hidden" id="m-cover-data">
+                <input type="hidden" id="m-cover-pos" value="50,50">
+                
+                <input type="text" id="m-name" placeholder="Codinome da Missão">
+                <textarea id="m-desc" placeholder="Breve resumo..."></textarea>
+                <input type="text" id="m-location-name" placeholder="Nome do Local (Ex: Base Alpha)">
+                
+                <div style="margin-top:10px; margin-bottom:10px;">
+                    <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Término da Missão (Opcional)</label>
+                    <input type="date" id="m-endDate" style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:10px; border-radius:8px; outline:none;">
+                </div>
+                <div style="margin-top:10px; margin-bottom:10px;">
+                    <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Visibilidade</label>
+                    <select id="m-accessType" onchange="if(window.MissionSystem) window.MissionSystem.togglePermUI(this.value, 'm')" style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:10px; border-radius:8px; outline:none;">
+                        <option value="all">Todos (Visível para todos)</option>
+                        <option value="local">Local (Base/Zona Restrita)</option>
+                        <option value="individual">Individual (Por Usuário/Cargo)</option>
+                    </select>
+                </div>
+                <div id="m-perm-container" style="display:none; margin-bottom:10px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #333;">
+                    <p style="font-size:0.7rem; color:#666; margin:0 0 8px 0;">Selecione cargos/usuários com acesso:</p>
+                    <button class="btn-perm" onclick="if(window.MissionSystem) window.MissionSystem.openPermSelector('m')" style="margin-top:0; height:35px; font-size:0.8rem;" type="button">
+                        <span data-icon="shield"></span> GERENCIAR ACESSOS
+                    </button>
+                    <div id="m-perm-summary" style="margin-top:8px; font-size:0.75rem; color:#aaa;">Cargos: 0 | Usuários: 0</div>
+                </div>
+
+                <div class="coord-row">
+                    <select id="m-type" style="flex: 1.2;">
+                        <option value="primary">Prioridade Principal</option>
+                        <option value="secondary">Prioridade Secundária</option>
+                        <option value="base">Base</option>
+                    </select>
+                    <select id="m-icon" style="flex: 1;">
+                        <option value="exclamation">Impacto (!)</option>
+                        <option value="question">Sinal (?)</option>
+                        <option value="tower">Torre</option>
+                        <option value="safehouse">Abrigo</option>
+                        <option value="ocultista">Ocultistas</option>
+                    </select>
+                </div>
+                <div class="coord-row">
+                    <input type="text" id="m-lng" placeholder="Longitude" readonly style="background:#080808; color:#888;">
+                    <input type="text" id="m-lat" placeholder="Latitude" readonly style="background:#080808; color:#888;">
+                    <button class="btn-target" onclick="startPicking()">
+                        <span data-icon="crosshair"></span>
+                        POSICIONAR
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('missionModal')" class="btn-cancel">CANCELAR</button>
+                <button onclick="saveMission()" class="btn-save">PUBLICAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIÇÃO DE MISSÃO -->
+    <div id="editMissionModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:var(--accent-color); margin-top:0;"><span data-icon="edit"></span> Editar</h2>
+            <input type="hidden" id="edit-m-id">
+            <div class="mission-form">
+                <div class="mission-cover-preview" id="edit-m-cover-preview" onclick="if(window.MissionCover)window.MissionCover.openModal('edit')">
+                    <span><span data-icon="image"></span> ALTERAR CAPA</span>
+                </div>
+                <input type="hidden" id="edit-m-cover-data">
+                <input type="hidden" id="edit-m-cover-pos" value="50,50">
+                
+                <input type="text" id="edit-m-name" placeholder="Nome">
+                <textarea id="edit-m-desc" placeholder="Descrição..."></textarea>
+                <input type="text" id="edit-m-location-name" placeholder="Nome do Local">
+
+                <div style="margin-top:10px; margin-bottom:10px;">
+                    <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Término da Missão (Opcional)</label>
+                    <input type="date" id="edit-m-endDate" style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:10px; border-radius:8px; outline:none;">
+                </div>
+                <div style="margin-top:10px; margin-bottom:10px;">
+                    <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Visibilidade</label>
+                    <select id="edit-m-accessType" onchange="if(window.MissionSystem) window.MissionSystem.togglePermUI(this.value, 'edit-m')" style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:10px; border-radius:8px; outline:none;">
+                        <option value="all">Todos (Visível para todos)</option>
+                        <option value="local">Local (Base/Zona Restrita)</option>
+                        <option value="individual">Individual (Por Usuário/Cargo)</option>
+                    </select>
+                </div>
+                <div id="edit-m-perm-container" style="display:none; margin-bottom:10px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #333;">
+                    <p style="font-size:0.7rem; color:#666; margin:0 0 8px 0;">Selecione cargos/usuários com acesso:</p>
+                    <button class="btn-perm" onclick="if(window.MissionSystem) window.MissionSystem.openPermSelector('edit-m')" style="margin-top:0; height:35px; font-size:0.8rem;" type="button">
+                        <span data-icon="shield"></span> GERENCIAR ACESSOS
+                    </button>
+                    <div id="edit-m-perm-summary" style="margin-top:8px; font-size:0.75rem; color:#aaa;">Cargos: 0 | Usuários: 0</div>
+                </div>
+
+                <div class="coord-row">
+                    <select id="edit-m-type" style="width:100%;">
+                        <option value="primary">Principal</option>
+                        <option value="secondary">Secundária</option>
+                        <option value="base">Base</option>
+                    </select>
+                    <select id="edit-m-icon" style="width:100%;">
+                        <option value="exclamation">Impacto (!)</option>
+                        <option value="question">Sinal (?)</option>
+                        <option value="tower">Torre</option>
+                        <option value="safehouse">Abrigo</option>
+                        <option value="ocultista">Ocultistas</option>
+                    </select>
+                </div>
+                <div class="coord-row">
+                    <input type="text" id="edit-m-lng" placeholder="Longitude" readonly style="background:#080808; color:#888; flex:1;">
+                    <input type="text" id="edit-m-lat" placeholder="Latitude" readonly style="background:#080808; color:#888; flex:1;">
+                    <button class="btn-target" onclick="startRepicking()" style="flex:2;">
+                        <span data-icon="crosshair"></span>
+                        MUDAR POSIÇÃO
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="deleteMissionConfirm()" class="btn-danger">EXCLUIR</button>
+                <button onclick="closeModal('editMissionModal')" class="btn-cancel">CANCELAR</button>
+                <button onclick="saveEditMission()" class="btn-save">SALVAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="configToast">Mensagem aqui</div>
+
+    <!-- MODAL DE PERMISSÕES -->
+    <div id="permissionsHubModal" class="modal">
+        <div class="modal-content">
+            <h3><span data-icon="shield"></span> Permissões de Acesso</h3>
+            <p style="color:#888; font-size:0.9rem;">Selecione quem pode ter acesso e interagir com este dado.</p>
+            
+            <h4 style="color:#aaa; margin:15px 0 5px 0; font-size:0.8rem;">POR CARGO:</h4>
+            <div id="permRolesList" class="role-select-grid" style="display:flex; flex-direction:column; gap:8px;"></div>
+            
+            <h4 style="color:#aaa; margin:15px 0 5px 0; font-size:0.8rem;">POR USUÁRIO:</h4>
+            <div id="permUsersList" class="role-select-grid" style="display:flex; flex-direction:column; gap:8px;"></div>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('permissionsHubModal')">FECHAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIÇÃO DE TEMPO -->
+    <div id="timeEditModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0;"><span data-icon="edit"></span> Editar Tempo de Jogo</h2>
+            <div class="mission-form">
+                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Nova Data</label>
+                <input type="date" id="sys-game-date" style="width:100%; background:#111; border:1px solid #333; color:#fff; padding:10px; border-radius:8px; outline:none;">
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('timeEditModal')" class="btn-cancel">CANCELAR</button>
+                <button onclick="saveGameTime()" class="btn-save">SALVAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="shared/js/api-helpers.js"></script>
+    <script src="shared/js/toast.js"></script>
+
+    <script src="js/map_controller.js"></script>
+</body>
+</html>

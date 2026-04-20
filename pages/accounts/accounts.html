@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestão de Contas e Cargos</title>
+    <link rel="stylesheet" href="shared/css/global.css">
+    <link rel="stylesheet" href="shared/css/components.css">
+    <link rel="stylesheet" href="pages/accounts/accounts.css">
+        <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="firebase/config.js"></script>
+    <script src="firebase/auth.js"></script>
+    <script src="firebase/accounts.js"></script>
+    <script src="firebase/roles.js"></script>
+    <script src="firebase/missions.js"></script>
+<script src="shared/js/theme.js"></script>
+    <script src="shared/js/icons.js"></script>
+    <script src="shared/js/menu.js"></script>
+    <script src="shared/js/loader.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-row">
+        <div class="title-group">
+            <button id="menuTrigger" class="menu-btn" data-icon="menu"></button>
+            <h1><span data-icon="users"></span> Gestão</h1>
+        </div>
+    </div>
+
+    <div id="configToast">Mensagem aqui</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchView('users', this)">Contas</button>
+        <button class="tab-btn" onclick="switchView('roles', this)">Cargos</button>
+    </div>
+
+    <!-- VIEW: USUÁRIOS -->
+    <div id="view-users">
+        <p style="color:#888; font-size:0.9rem; margin-bottom: 15px;">Gerencie todas as contas do sistema.</p>
+        <input type="text" class="search-bar" placeholder="Buscar por Apelido ou Email..." oninput="filterUsers(this.value)">
+        <div id="usersList">Carregando...</div>
+    </div>
+
+    <!-- VIEW: CARGOS -->
+    <div id="view-roles" style="display: none;">
+        <p style="color:#888; font-size:0.9rem;">Defina hierarquias e acessos.</p>
+        <div class="card" style="margin-bottom:20px; border-color: var(--accent-color);">
+            <h3 id="roleFormTitle" style="color: var(--accent-color);"><span data-icon="shield"></span> Novo Cargo</h3>
+            <input type="hidden" id="editingRoleId" value="">
+            <label style="font-size:0.8rem; color:#666;">NOME DO CARGO</label>
+            <input type="text" id="roleName" placeholder="Ex: Mestre Supremo" style="margin-bottom:15px;">
+            <label style="font-size:0.8rem; color:#666;">COR DA TAG</label>
+            <div class="color-picker-row">
+                <div id="roleColorPreview" class="role-color-box" onclick="openColorModal()"></div>
+                <input type="hidden" id="roleColorValue" value="#00ff88">
+            </div>
+            <p style="font-size:0.8rem; color:#888; margin-bottom:5px;">PERMISSÕES DE ACESSO:</p>
+            <div class="permissions-container">
+                <div class="perm-card" onclick="togglePerm(this)" data-val="ALL"><span data-icon="bolt"></span><span>ACESSO TOTAL</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/dashboard.html"><span data-icon="home"></span><span>Central</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/map.html"><span data-icon="map-zone"></span><span>Mapa Mundi</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/games_panel.html"><span data-icon="gamepad"></span><span>Jogos</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/prompt.html"><span data-icon="scroll"></span><span>Prompts</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/backup.html"><span data-icon="box"></span><span>Backup</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/accounts.html"><span data-icon="users"></span><span>Contas</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/config.html"><span data-icon="settings"></span><span>Configurações</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/glossary.html"><span data-icon="book"></span><span>Manual</span></div>
+            </div>
+            <div class="btn-row">
+                <button class="btn-cancel-edit" onclick="resetRoleForm()" id="cancelEditBtn" style="display:none;">CANCELAR</button>
+                <button class="btn-new" onclick="saveRole()" id="saveRoleBtn" style="width:100%;">SALVAR CARGO</button>
+            </div>
+        </div>
+        <h3>Cargos Existentes</h3>
+        <div id="rolesList">Carregando...</div>
+    </div>
+</div>
+
+<!-- MODAL GERENCIAR CARGOS -->
+<div id="manageRolesModal" class="modal">
+    <div class="modal-content">
+        <h3>Atribuir Cargos</h3>
+        <p style="color:#888; font-size:0.9rem; margin-bottom:15px;">Selecione os cargos para <span id="manageUserName" style="color:#fff;"></span></p>
+        <div id="manageRolesList" class="role-select-grid" style="display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto;"></div>
+        <input type="hidden" id="manageUserId">
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal('manageRolesModal')">CANCELAR</button>
+            <button class="btn-save" onclick="confirmUserRoles()">SALVAR</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE COR -->
+<div id="colorModal" class="modal">
+    <div class="modal-content modal-mini">
+        <h2 style="margin-top:0;">Escolha a Cor</h2>
+        <div class="swatch-grid">
+            <div class="swatch" style="background:#00ff88" onclick="selectSwatchAndClose('#00ff88')"></div>
+            <div class="swatch" style="background:#4488ff" onclick="selectSwatchAndClose('#4488ff')"></div>
+            <div class="swatch" style="background:#ff4444" onclick="selectSwatchAndClose('#ff4444')"></div>
+            <div class="swatch" style="background:#e056fd" onclick="selectSwatchAndClose('#e056fd')"></div>
+            <div class="swatch" style="background:#f1c40f" onclick="selectSwatchAndClose('#f1c40f')"></div>
+            <div class="swatch" style="background:#ffffff" onclick="selectSwatchAndClose('#ffffff')"></div>
+            <div class="swatch" style="background:#1a1a1a" onclick="selectSwatchAndClose('#1a1a1a')"></div>
+            <div class="swatch" style="background:#252525" onclick="selectSwatchAndClose('#252525')"></div>
+            <div class="swatch" style="background:#000000" onclick="selectSwatchAndClose('#000000')"></div>
+            <div class="swatch swatch-plus">
+                <span data-icon="plus"></span>
+                <input type="color" id="nativePicker" oninput="updatePreviewOnly(this.value)">
+            </div>
+        </div>
+        <input type="text" id="hexInput" class="hex-input" placeholder="#000000" oninput="updatePreviewOnly(this.value)">
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeColorModal()">CANCELAR</button>
+            <button class="btn-save" onclick="closeColorModal()">CONFIRMAR</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE CONFIRMAÇÃO -->
+<div id="customConfirmModal" class="modal" style="z-index: 15000;">
+    <div class="modal-content" style="max-width: 350px; text-align: center; display: flex; flex-direction: column; align-items: center; padding: 30px 25px;">
+        <h3 style="display:flex; flex-direction:column; justify-content:center; align-items:center; color:#ff4444; gap:15px;">
+            <span data-icon="trash"></span> Atenção
+        </h3>
+        <p id="confirmMessage" style="color:#ccc; margin-bottom:25px;">Tem certeza?</p>
+        <div class="btn-row" style="width:100%;">
+            <button class="btn-cancel" onclick="closeConfirm()">CANCELAR</button>
+            <button class="btn-danger" onclick="doConfirm()">CONFIRMAR</button>
+        </div>
+    </div>
+</div>
+<script src="shared/js/api-helpers.js"></script>
+<script src="shared/js/toast.js"></script>
+<script src="shared/js/modal.js"></script>
+<script src="/pages/accounts/accounts.js"></script>
+</body>
+</html>

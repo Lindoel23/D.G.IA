@@ -1,0 +1,43 @@
+/* --- pages/accounts/accounts.css --- */
+
+/* Estilos exclusivos da página de contas */
+h3 { display: flex; align-items: center; gap: 10px; margin-top: 0; }
+h3 .icon-svg { width: 24px !important; height: 24px !important; min-width: 24px; margin: 0; stroke: var(--accent-color); }
+
+/* Lista de Usuários */
+.user-item { background: #111; border: 1px solid #333; border-radius: 8px; margin-bottom: 10px; overflow: hidden; transition: 0.3s; }
+.user-header { padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #1a1a1a; min-height: 60px; }
+.user-header:hover { background: #222; }
+.user-info-container { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.user-header h4 { margin: 0; color: var(--text-color); font-size: 1rem; }
+.role-badges { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+.role-badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; color: #000; font-weight: bold; white-space: nowrap; line-height: 1; display: block; }
+.arrow { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; }
+.arrow .icon-img { width: 18px; height: 18px; background-color: #666; margin: 0; transition: transform 0.3s; }
+.user-item.open .arrow .icon-img { transform: rotate(180deg); background-color: var(--accent-color); }
+.user-details { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; background: #000; border-top: 1px solid #333; }
+.user-item.open .user-details { max-height: 800px; }
+.detail-content { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+.edit-group { display: flex; flex-direction: column; gap: 5px; }
+.edit-group label { font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 0; display: block; }
+.user-actions { display: flex; gap: 10px; margin-top: 15px; width: 100%; align-items: stretch; }
+.user-actions button { flex: 1; height: 45px; padding: 0; display: flex; justify-content: center; align-items: center; border-radius: 6px; font-weight: bold; font-size: 0.9rem; margin: 0; box-sizing: border-box; border: 1px solid transparent; }
+
+/* Cargos */
+.color-picker-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+.role-color-box { width: 100%; height: 40px; border-radius: 6px; border: 2px solid #fff; cursor: pointer; background: #00ff88; transition: transform 0.2s; }
+.role-card { background: #111; padding: 10px 15px; border: 1px solid #333; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; min-height: 55px; }
+.role-info { display: flex; align-items: center; gap: 10px; }
+.role-info strong { font-size: 1rem; color: #fff; }
+.role-actions { display: flex; gap: 8px; align-items: center; }
+
+/* Hex Input */
+.hex-input { text-align: center; font-family: 'Consolas', monospace; font-size: 1.2rem; letter-spacing: 2px; width: 100%; margin-bottom: 20px; padding: 10px; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; }
+
+/* Native Color Picker */
+#nativePicker { position: absolute; opacity: 0; width: 200%; height: 200%; cursor: pointer; left: -50%; top: -50%; padding: 0; margin: 0; }
+
+/* Check Icon in Role Select */
+.role-check-icon { display: none; color: var(--accent-color); font-weight: bold; }
+.role-select-btn.selected .role-check-icon { display: block; }
+.role-check-icon .icon-img { width: 20px; height: 20px; background-color: var(--accent-color); margin: 0; }
