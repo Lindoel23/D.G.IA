@@ -29,7 +29,7 @@ async function doRegister() {
     try {
         const result = await OrdemAuth.register(email, password, nickname);
         if (result.success) {
-            window.showGlobalLoader(() => window.location.href = '/pages/login/login.html');
+            window.showGlobalLoader(() => window.location.href = 'pages/login/login.html');
         } else {
             showError(result.message || "Erro ao registrar!");
         }

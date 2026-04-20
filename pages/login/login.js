@@ -28,7 +28,7 @@ async function doLogin() {
     try {
         const result = await OrdemAuth.login(login, password);
         if (result.success) {
-            window.showGlobalLoader(() => window.location.href = '/pages/dashboard/dashboard.html');
+            window.showGlobalLoader(() => window.location.href = 'pages/dashboard/dashboard.html');
         } else {
             showError(result.message || "Credenciais inválidas!");
         }

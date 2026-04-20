@@ -132,7 +132,7 @@ async function initMenu() {
         if (window.showGlobalLoader) window.showGlobalLoader();
         setTimeout(async () => {
             await OrdemAuth.logout();
-        window.showGlobalLoader(() => window.location.href = '/pages/login/login.html');
+        window.showGlobalLoader(() => window.location.href = 'pages/login/login.html');
         }, 400);
     };
     sidebar.appendChild(logoutBtn);
