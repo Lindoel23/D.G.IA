@@ -3,7 +3,7 @@
 (async function() {
     const userName = localStorage.getItem('user_name') || 'Viajante';
     const wb = document.getElementById('welcomeBox');
-    wb.innerHTML = `<h3>Bem-vindo(a), ${userName}! <span class="hand-container" data-icon="hand"></span></h3>`;
+    wb.innerHTML = `<h3>Bem-vindo(a), <span style="white-space: nowrap;">${userName}!&nbsp;<span class="hand-container" data-icon="hand"></span></span></h3>`;
     if (window.renderIcons) window.renderIcons();
 
     try {
