@@ -134,19 +134,23 @@
         }
     });
 
-    function pollFirebase() {
+    function pollFirebase(attempts = 0) {
         if (window.firebase && typeof firebase.auth === 'function') {
             const unsub = firebase.auth().onAuthStateChanged(() => {
                 STATE.firebaseReady = true;
                 unsub();
                 checkAndHideLoader();
             });
+        } else if (attempts < 50) {
+            // Tenta por até 2.5 segundos (50 * 50ms) aguardando o load do Firebase
+            setTimeout(() => pollFirebase(attempts + 1), 50);
         } else {
+            // Desiste e libera para não travar a tela pra sempre
             STATE.firebaseReady = true;
             checkAndHideLoader();
         }
     }
-    setTimeout(pollFirebase, 20);
+    setTimeout(() => pollFirebase(0), 20);
 
     // --- NAVEGAÇÃO & VIEW TRANSITIONS API --- //
     document.addEventListener('click', (e) => {
@@ -158,21 +162,11 @@
             !link.href.includes('/api/') && !link.hasAttribute('download')) {
             
             e.preventDefault(); 
-
-            // Feature detection: View Transitions nativas do Chrome 111+
-            if (document.startViewTransition) {
-                // Em MPAs o ViewTransition normalmente é resolvido via tag meta: 
-                // <meta name="view-transition" content="same-origin">
-                // Mas podemos forçar o escurecimento do body
-                document.startViewTransition(() => {
-                    window.location.href = link.href;
-                });
-            } else {
-                // Fallback seguro usando Loader animado
-                window.showGlobalLoader(() => {
-                    window.location.href = link.href;
-                });
-            }
+            
+            // Garantia: anima o loader da nossa interface ao invés de congelar a API de transição
+            window.showGlobalLoader(() => {
+                window.location.href = link.href;
+            });
         }
     });
 
