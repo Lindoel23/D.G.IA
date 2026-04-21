@@ -1,21 +1,43 @@
 /* pages/fichas/fichas.css */
 
+/* Centraliza a página inteira */
+.fichas-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    max-width: 100% !important;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.fichas-header {
+    justify-content: center !important;
+    width: 100%;
+    max-width: 600px;
+}
+
+.fichas-header .title-group {
+    justify-content: center;
+}
+
 /* Bloco central de manutenção */
 .maintenance-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 60vh;
     text-align: center;
     gap: 20px;
     padding: 20px;
+    flex: 1;
 }
 
-/* Vídeo com fundo preto removido via blend */
+/* Vídeo com fundo preto removido via blend + flutuação */
 .maintenance-video {
-    width: 180px;
-    max-width: 60vw;
+    width: 280px;
+    max-width: 80vw;
     border-radius: 12px;
     mix-blend-mode: screen;
     pointer-events: none;
@@ -78,7 +100,7 @@
 
 @media (max-width: 768px) {
     .maintenance-video {
-        width: 150px;
+        width: 220px;
     }
     .maintenance-title {
         font-size: 1.4rem;
