@@ -4,7 +4,7 @@
     <script>(function(){var b=document.createElement("base");b.href=location.pathname.indexOf("/D.G.IA/")!==-1?"/D.G.IA/":"/";document.head.prepend(b)})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gest�o de Contas e Cargos</title>
+    <title>Gestão de Contas e Cargos</title>
     <link rel="stylesheet" href="shared/css/global.css">
     <link rel="stylesheet" href="shared/css/components.css">
     <link rel="stylesheet" href="pages/accounts/accounts.css">
@@ -28,7 +28,7 @@
     <div class="header-row">
         <div class="title-group">
             <button id="menuTrigger" class="menu-btn" data-icon="menu"></button>
-            <h1><span data-icon="users"></span> Gest�o</h1>
+            <h1><span data-icon="users"></span> Gestão</h1>
         </div>
     </div>
 
@@ -39,7 +39,7 @@
         <button class="tab-btn" onclick="switchView('roles', this)">Cargos</button>
     </div>
 
-    <!-- VIEW: USU�RIOS -->
+    <!-- VIEW: USUÁRIOS -->
     <div id="view-users">
         <p style="color:#888; font-size:0.9rem; margin-bottom: 15px;">Gerencie todas as contas do sistema.</p>
         <input type="text" class="search-bar" placeholder="Buscar por Apelido ou Email..." oninput="filterUsers(this.value)">
@@ -59,7 +59,7 @@
                 <div id="roleColorPreview" class="role-color-box" onclick="openColorModal()"></div>
                 <input type="hidden" id="roleColorValue" value="#00ff88">
             </div>
-            <p style="font-size:0.8rem; color:#888; margin-bottom:5px;">PERMISS�ES DE ACESSO:</p>
+            <p style="font-size:0.8rem; color:#888; margin-bottom:5px;">PERMISSÕES DE ACESSO:</p>
             <div class="permissions-container">
                 <div class="perm-card" onclick="togglePerm(this)" data-val="ALL"><span data-icon="bolt"></span><span>ACESSO TOTAL</span></div>
                 <div class="perm-card" onclick="togglePerm(this)" data-val="/dashboard.html"><span data-icon="home"></span><span>Central</span></div>
@@ -68,7 +68,7 @@
                 <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/prompt.html"><span data-icon="scroll"></span><span>Prompts</span></div>
                 <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/backup.html"><span data-icon="box"></span><span>Backup</span></div>
                 <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/accounts.html"><span data-icon="users"></span><span>Contas</span></div>
-                <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/config.html"><span data-icon="settings"></span><span>Configura��es</span></div>
+                <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/config.html"><span data-icon="settings"></span><span>Configurações</span></div>
                 <div class="perm-card" onclick="togglePerm(this)" data-val="/tools/glossary.html"><span data-icon="book"></span><span>Manual</span></div>
             </div>
             <div class="btn-row">
@@ -122,11 +122,11 @@
     </div>
 </div>
 
-<!-- MODAL DE CONFIRMA��O -->
+<!-- MODAL DE CONFIRMAÇÃO -->
 <div id="customConfirmModal" class="modal" style="z-index: 15000;">
     <div class="modal-content" style="max-width: 350px; text-align: center; display: flex; flex-direction: column; align-items: center; padding: 30px 25px;">
         <h3 style="display:flex; flex-direction:column; justify-content:center; align-items:center; color:#ff4444; gap:15px;">
-            <span data-icon="trash"></span> Aten��o
+            <span data-icon="trash"></span> Atenção
         </h3>
         <p id="confirmMessage" style="color:#ccc; margin-bottom:25px;">Tem certeza?</p>
         <div class="btn-row" style="width:100%;">
