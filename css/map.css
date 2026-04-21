@@ -3,7 +3,8 @@
 
 /* ===== LAYOUT PRINCIPAL ===== */
 html, body { 
-    height: 100vh; 
+    height: 100%;
+    height: 100dvh; 
     width: 100vw;
     overflow: hidden; 
     background: var(--bg-color); 
@@ -12,7 +13,8 @@ html, body {
 }
 
 .map-container { 
-    height: 100vh; 
+    height: 100%;
+    height: 100dvh; 
     width: 100vw;
     position: relative; 
     margin: 0;
@@ -111,6 +113,7 @@ html, body {
     box-shadow: -20px 0 60px rgba(0,0,0,0.9); 
     box-sizing: border-box;
     overflow-y: hidden;
+    overflow-x: hidden;
 }
 
 #mission-sidebar.open { 
