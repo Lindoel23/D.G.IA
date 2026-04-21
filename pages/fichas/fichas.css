@@ -12,16 +12,8 @@
     box-sizing: border-box;
 }
 
-.fichas-header {
-    justify-content: center !important;
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 0 !important;
-}
 
-.fichas-header .title-group {
-    justify-content: center !important;
-}
+
 
 /* Bloco central de manutenção */
 .maintenance-wrapper {
