@@ -10,8 +10,13 @@
 }
 
 * { 
-    box-sizing: border-box; 
-    scroll-behavior: smooth; /* Garante rolagem suave para qualquer elemento rolável */
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+}
+
+*:focus {
+    outline: none;
 }
 
 /* --- SCROLLBAR CUSTOMIZADO (Todos os navegadores WebKit/Chromium) --- */
