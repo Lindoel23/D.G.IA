@@ -156,6 +156,7 @@ window.ProfilePicture = {
                 border: 3px solid var(--accent-color);
                 box-shadow: 0 5px 20px rgba(0,0,0,0.5);
                 overflow: hidden;
+                margin-bottom: 25px; /* Added spacing under the profile picture */
             }
             .config-profile-bg:hover {
                 filter: brightness(0.85);
@@ -169,7 +170,7 @@ window.ProfilePicture = {
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                opacity: 0;
+                opacity: 0.5; /* Always partially visible to show it's editable */
                 transition: opacity 0.25s;
                 color: var(--accent-color);
                 font-weight: bold;
@@ -178,7 +179,7 @@ window.ProfilePicture = {
                 backdrop-filter: blur(2px);
             }
             .config-profile-bg:hover .pp-edit-overlay {
-                opacity: 1;
+                opacity: 1; /* Fully visible on hover */
             }
             
             .config-profile-bg .pp-edit-overlay .icon-img {
