@@ -112,7 +112,7 @@ h3 .icon-img { width: 24px; height: 24px; background-color: var(--accent-color);
 .title-group .menu-btn { position: absolute; left: 0; top: 50%; transform: translateY(-50%); }
 
 /* Override para o texto do titulo ficar puramente no centro, isolando o tamanho do ícone */
-.title-group h1 { display: inline-block; position: relative; }
+.title-group h1 { display: inline-block; position: relative; max-width: calc(100vw - 120px); text-align: center; margin-top: 5px; }
 .title-group h1 .icon-img { position: absolute; right: 100%; margin-right: 12px; top: 50%; transform: translateY(-50%); }
 
 /* Override para o Mapa para n~ao obstruir o globo */
