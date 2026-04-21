@@ -136,11 +136,21 @@
 
     function pollFirebase(attempts = 0) {
         if (window.firebase && typeof firebase.auth === 'function') {
-            const unsub = firebase.auth().onAuthStateChanged(() => {
-                STATE.firebaseReady = true;
-                unsub();
-                checkAndHideLoader();
-            });
+            try {
+                const unsub = firebase.auth().onAuthStateChanged(() => {
+                    STATE.firebaseReady = true;
+                    unsub();
+                    checkAndHideLoader();
+                });
+            } catch(e) {
+                // If it fails (e.g. app not initialized yet), treat as not ready and wait
+                if (attempts < 50) {
+                    setTimeout(() => pollFirebase(attempts + 1), 50);
+                } else {
+                    STATE.firebaseReady = true;
+                    checkAndHideLoader();
+                }
+            }
         } else if (attempts < 50) {
             // Tenta por até 2.5 segundos (50 * 50ms) aguardando o load do Firebase
             setTimeout(() => pollFirebase(attempts + 1), 50);
