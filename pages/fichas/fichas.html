@@ -23,8 +23,8 @@
     <script src="shared/js/loader.js"></script>
 </head>
 <body>
-    <div class="container" style="max-width: 1200px;">
-        <div class="header-row">
+    <div class="container fichas-container">
+        <div class="header-row fichas-header">
             <div class="title-group">
                 <button id="menuTrigger" class="menu-btn" data-icon="menu"></button>
                 <h1><span data-icon="id-card"></span> Fichas</h1>
@@ -33,7 +33,9 @@
 
         <!-- ESTADO: EM CONSTRUÇÃO -->
         <div class="maintenance-wrapper">
-            <img src="assets/Manutenção.gif" alt="Em Construção" class="maintenance-gif">
+            <video class="maintenance-video" autoplay loop muted playsinline>
+                <source src="assets/Manutenção.mp4" type="video/mp4">
+            </video>
             <h2 class="maintenance-title">Em Construção</h2>
             <p class="maintenance-subtitle">Este módulo está sendo forjado. Em breve você poderá criar e gerenciar fichas de personagens por aqui.</p>
             <div class="maintenance-bar">

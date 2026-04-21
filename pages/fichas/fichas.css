@@ -1,30 +1,50 @@
 /* pages/fichas/fichas.css */
 
+/* Força a página toda a ser um cenário centralizado */
+.fichas-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    max-width: 100% !important;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Centraliza o header também */
+.fichas-header {
+    justify-content: center !important;
+    width: 100%;
+    max-width: 600px;
+}
+
+.fichas-header .title-group {
+    justify-content: center;
+}
+
+/* Bloco central de manutenção */
 .maintenance-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 60vh;
     text-align: center;
-    gap: 25px;
+    gap: 20px;
     padding: 20px;
+    flex: 1;
 }
 
-.maintenance-gif {
-    width: 280px;
+/* Vídeo com fundo preto removido via blend */
+.maintenance-video {
+    width: 300px;
     max-width: 80vw;
     border-radius: 12px;
-    filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.15));
-    animation: float-maintenance 4s ease-in-out infinite;
+    mix-blend-mode: screen;
+    pointer-events: none;
 }
 
-@keyframes float-maintenance {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(-12px); }
-    100% { transform: translateY(0); }
-}
-
+/* Título em construção */
 .maintenance-title {
     font-size: 1.8rem;
     font-weight: 900;
@@ -40,6 +60,7 @@
     50%      { text-shadow: 0 0 35px rgba(0, 255, 136, 0.6), 0 0 60px rgba(0, 255, 136, 0.2); }
 }
 
+/* Subtexto */
 .maintenance-subtitle {
     color: #888;
     font-size: 0.95rem;
@@ -72,8 +93,8 @@
 }
 
 @media (max-width: 768px) {
-    .maintenance-gif {
-        width: 220px;
+    .maintenance-video {
+        width: 240px;
     }
     .maintenance-title {
         font-size: 1.4rem;
