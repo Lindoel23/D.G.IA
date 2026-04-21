@@ -15,9 +15,18 @@ body {
     padding: 0; 
 }
 
-.logo-container { position: absolute; top: 10vh; left: 50%; width: 100%; transform: translateX(-50%); text-align: center; animation: float-auth 5s ease-in-out infinite; z-index: 5; pointer-events: none; }
+.logo-container { position: relative; margin-bottom: 25px; text-align: center; animation: float-auth 5s ease-in-out infinite; z-index: 5; }
 .logo { font-size: 3.5rem; font-weight: 900; color: var(--accent-color); text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 0 20px rgba(0, 255, 136, 0.4); }
-@keyframes float-auth { 0% { transform: translate3d(-50%, 0, 0); } 50% { transform: translate3d(-50%, -15px, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+@keyframes float-auth { 0% { transform: translateY(0); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0); } }
+
+/* Elemento fantasma para equilibrar o peso visual da logo e manter o card centralizado */
+body::after {
+    content: '';
+    display: block;
+    height: 80px; /* Compensa aproximadamente a altura da logo */
+    width: 100%;
+    flex-shrink: 0;
+}
 
 .login-card { 
     width: 90%; 
@@ -31,7 +40,6 @@ body {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s, box-shadow 0.3s;
-    margin: auto 0;
 }
 
 .login-card:hover {
