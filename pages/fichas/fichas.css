@@ -38,6 +38,8 @@
 /* Vídeo com fundo preto removido via blend + flutuação */
 .maintenance-video {
     width: 400px;
+    min-width: 400px;
+    height: auto;
     max-width: 85vw;
     border-radius: 12px;
     mix-blend-mode: screen;
@@ -102,6 +104,7 @@
 @media (max-width: 768px) {
     .maintenance-video {
         width: 300px;
+        min-width: 300px;
     }
     .maintenance-title {
         font-size: 1.4rem;
