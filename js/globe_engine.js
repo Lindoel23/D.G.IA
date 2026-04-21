@@ -405,6 +405,11 @@ window.GlobeEngine = (function() {
         }, { passive: false });
 
         canvas.addEventListener('touchend', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                lastTouchX = e.touches[0].clientX;
+                lastTouchY = e.touches[0].clientY;
+            }
             if (e.touches.length === 0) {
                 isDragging = false;
                 emitPickCoordinate();
