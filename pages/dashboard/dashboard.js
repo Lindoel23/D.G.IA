@@ -3,7 +3,7 @@
 (async function() {
     const userName = localStorage.getItem('user_name') || 'Viajante';
     const wb = document.getElementById('welcomeBox');
-    wb.innerHTML = `<h3>Bem-vindo(a), ${userName}! <span class="hand-container" data-icon="hand"></span></h3>`;
+    wb.innerHTML = `<h3 style="display: block; text-align: center; font-size: clamp(1.6rem, 6vw, 2.2rem); line-height: 1.4; margin: 0;">Bem-vindo(a), ${userName}! <span class="hand-container" data-icon="hand" style="display: inline-block; vertical-align: middle; margin-left: 6px;"></span></h3>`;
     if (window.renderIcons) window.renderIcons();
 
     try {
