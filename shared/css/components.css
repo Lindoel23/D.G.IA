@@ -201,6 +201,8 @@ button, .btn-link, .btn-play, .btn-new, .btn-save, .btn-cancel, .btn-danger, .bt
     }
     .btn-row button, .modal-footer button {
         width: 100%;
+        flex: none;
+        min-height: 45px;
     }
     .swatch-grid {
         grid-template-columns: repeat(5, 1fr);
