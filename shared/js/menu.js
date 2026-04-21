@@ -1,9 +1,10 @@
-﻿// shared/js/menu.js — Menu Sidebar Overlay (Firebase)
+// shared/js/menu.js — Menu Sidebar Overlay (Firebase)
 
 const ALL_MENU_ITEMS = [
     // --- GERAL ---
     { label: 'Central', link: 'pages/dashboard/dashboard.html', group: 'common', iconKey: 'home' },
     { label: 'Mapa Mundi', link: 'tools/map.html', group: 'common', iconKey: 'map-zone' },
+    { label: 'Fichas', link: 'pages/fichas/fichas.html', group: 'common', iconKey: 'id-card' },
     { label: 'Configurações', link: 'pages/config/config.html', group: 'common', iconKey: 'settings' },
 
     // --- ADMIN ---
