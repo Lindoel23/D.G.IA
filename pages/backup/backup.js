@@ -13,6 +13,13 @@ function loadTree() {
 loadTree();
 if (window.renderIcons) window.renderIcons();
 
+// --- CONTROLE DE AMBIENTE ---
+const isLocalEnv = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.');
+if (isLocalEnv) {
+    const snapshotCard = document.getElementById('snapshotCard');
+    if (snapshotCard) snapshotCard.style.display = ''; // Reverte pro padrão do CSS (flex)
+}
+
 // --- SNAPSHOT EXPORT SYSTEM --- //
 const FILES_TO_BACKUP = [
     "index.html", "css/map.css", "css/mission_system.css", "firebase/accounts.js", 
