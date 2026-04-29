@@ -164,18 +164,13 @@ async function saveEditMission() {
     if(!name) return window.showToast("Preencha obrigatoriamente o nome!", true);
 
     try {
-        // Busca missões, encontra e atualiza
-        let missions = await OrdemMissions.getMissions();
-        const idx = missions.findIndex(m => m && m.id === id);
-        if (idx >= 0) {
-            Object.assign(missions[idx], { 
-                name, description: desc, locationName: locName, 
-                type, icon, lng, lat, 
-                accessType, allowedRoles, allowedUsers, 
-                endDate, coverImage, coverPos 
-            });
-            await OrdemMissions.setMissions(missions);
-        }
+        // Atualiza a missão diretamente no Firebase usando Object Keys (Evita Race Conditions)
+        await OrdemMissions.updateMission(id, { 
+            name, description: desc, locationName: locName, 
+            type, icon, lng, lat, 
+            accessType, allowedRoles, allowedUsers, 
+            endDate, coverImage, coverPos 
+        });
         window.showToast("Coordenadas atualizadas com maestria!");
         closeModal('editMissionModal');
         setTimeout(() => window.location.reload(), 1000);

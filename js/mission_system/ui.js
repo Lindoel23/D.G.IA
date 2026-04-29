@@ -210,14 +210,9 @@ window.MissionSystem.renderList = function(containerId) {
                         if(!m.viewedBy) m.viewedBy = [];
                         m.viewedBy.push(this.userPermissions.userId);
 
-                        // Salva viewedBy no Firebase
-                        OrdemMissions.getMissions().then(missions => {
-                            const mi = missions.findIndex(x => x && x.id === m.id);
-                            if (mi >= 0) {
-                                missions[mi].viewedBy = m.viewedBy;
-                                OrdemMissions.setMissions(missions);
-                            }
-                        }).catch(e => console.error("Erro marcando view", e));
+                        // Salva viewedBy no Firebase usando updateMission para evitar sobrescrever a array inteira
+                        OrdemMissions.updateMission(m.id, { viewedBy: m.viewedBy })
+                            .catch(e => console.error("Erro marcando view", e));
 
                         const tag = rect.querySelector('.mission-rect-new-tag');
                         if (tag) tag.remove();
@@ -431,11 +426,12 @@ window.MissionSystem.executeToggleAccess = async function(missionId, newAccess) 
         let missions = await OrdemMissions.getMissions();
         const mIdx = missions.findIndex(x => x && x.id === missionId);
         if (mIdx >= 0) {
+            let changes = {};
             if (newAccess === 'all' && missions[mIdx].accessType === 'individual') {
-                missions[mIdx].originalAccessType = 'individual';
+                changes.originalAccessType = 'individual';
             }
-            missions[mIdx].accessType = newAccess;
-            await OrdemMissions.setMissions(missions);
+            changes.accessType = newAccess;
+            await OrdemMissions.updateMission(missionId, changes);
         }
         if (true) {
             // Atualizar missão local

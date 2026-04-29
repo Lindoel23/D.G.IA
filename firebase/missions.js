@@ -3,39 +3,56 @@
 
 window.OrdemMissions = {
 
-    // Lê todas as missões (retorna array)
+    // Lê todas as missões (retorna array para o UI, mas salva como objeto)
     async getMissions() {
         try {
             const snap = await dbRef('missions').once('value');
             const data = snap.val();
             if (!data) return [];
-            if (Array.isArray(data)) return data.filter(Boolean);
+            
+            // AUTO MIGRATION: Se for array, converte para objeto e salva no Firebase
+            if (Array.isArray(data)) {
+                console.log("🛠️ Iniciando Migração Automática de Array para Objeto (Missions)...");
+                const newObj = {};
+                data.forEach((m, idx) => {
+                    if (m) {
+                        const mId = m.id || (Date.now().toString() + idx);
+                        m.id = mId; 
+                        newObj[mId] = m;
+                    }
+                });
+                await dbRef('missions').set(newObj);
+                console.log("✅ Migração de Missões Concluída!");
+                return Object.values(newObj);
+            }
+            
             return Object.values(data);
         } catch (e) { return []; }
     },
 
-    // Salva TODAS as missões (sobrescreve)
+    // Salva TODAS as missões (agora deve receber ou construir um dicionário)
     async setMissions(missionsArray) {
         try {
-            await dbRef('missions').set(missionsArray);
+            const newObj = {};
+            missionsArray.forEach(m => { if(m && m.id) newObj[m.id] = m; });
+            await dbRef('missions').set(newObj);
             return true;
         } catch (e) { return false; }
     },
 
-    // Atualiza uma missão específica (por index no array)
-    async updateMission(index, changesObj) {
+    // Atualiza uma missão específica (por ID direto)
+    async updateMission(missionId, changesObj) {
         try {
-            await dbRef('missions/' + index).update(changesObj);
+            await dbRef(`missions/${missionId}`).update(changesObj);
             return true;
         } catch (e) { return false; }
     },
 
-    // Cria missão (append no array)
+    // Cria missão (set direto no ID)
     async createMission(missionData) {
         try {
-            const missions = await this.getMissions();
-            missions.push(missionData);
-            await dbRef('missions').set(missions);
+            if (!missionData.id) missionData.id = Date.now().toString();
+            await dbRef(`missions/${missionData.id}`).set(missionData);
             return true;
         } catch (e) { return false; }
     },
@@ -43,9 +60,7 @@ window.OrdemMissions = {
     // Deleta missão por ID
     async deleteMission(missionId) {
         try {
-            let missions = await this.getMissions();
-            missions = missions.filter(m => m && m.id !== missionId);
-            await dbRef('missions').set(missions);
+            await dbRef(`missions/${missionId}`).remove();
             return true;
         } catch (e) { return false; }
     },
@@ -73,43 +88,54 @@ window.OrdemMissions = {
             const snap = await dbRef('projects').once('value');
             const data = snap.val();
             if (!data) return [];
-            if (Array.isArray(data)) return data.filter(Boolean);
+            
+            // AUTO MIGRATION: Se for array, converte para objeto
+            if (Array.isArray(data)) {
+                console.log("🛠️ Iniciando Migração Automática de Array para Objeto (Projects)...");
+                const newObj = {};
+                data.forEach((p, idx) => {
+                    if (p) {
+                        const pId = p.id || (Date.now().toString() + idx);
+                        p.id = pId;
+                        newObj[pId] = p;
+                    }
+                });
+                await dbRef('projects').set(newObj);
+                console.log("✅ Migração de Projetos Concluída!");
+                return Object.values(newObj);
+            }
+            
             return Object.values(data);
         } catch (e) { return []; }
     },
 
     async setProjects(projectsArray) {
         try {
-            await dbRef('projects').set(projectsArray);
+            const newObj = {};
+            projectsArray.forEach(p => { if(p && p.id) newObj[p.id] = p; });
+            await dbRef('projects').set(newObj);
             return true;
         } catch (e) { return false; }
     },
 
     async createProject(projectData) {
         try {
-            const projects = await this.getProjects();
-            projects.push(projectData);
-            await dbRef('projects').set(projects);
+            if (!projectData.id) projectData.id = Date.now().toString();
+            await dbRef(`projects/${projectData.id}`).set(projectData);
             return true;
         } catch (e) { return false; }
     },
 
     async updateProject(projectId, changesObj) {
         try {
-            const projects = await this.getProjects();
-            const idx = projects.findIndex(p => p && p.id === projectId);
-            if (idx < 0) return false;
-            Object.assign(projects[idx], changesObj);
-            await dbRef('projects').set(projects);
+            await dbRef(`projects/${projectId}`).update(changesObj);
             return true;
         } catch (e) { return false; }
     },
 
     async deleteProject(projectId) {
         try {
-            let projects = await this.getProjects();
-            projects = projects.filter(p => p && p.id !== projectId);
-            await dbRef('projects').set(projects);
+            await dbRef(`projects/${projectId}`).remove();
             return true;
         } catch (e) { return false; }
     }
