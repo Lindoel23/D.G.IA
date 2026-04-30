@@ -9,9 +9,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="firebase/config.js?v=mokzzan8"></script>
-    <script src="firebase/accounts.js?v=mokzzan8"></script>
-    <script src="firebase/missions.js?v=mokzzan8"></script>
+    <script src="firebase/config.js?v=mol05yel"></script>
+    <script src="firebase/accounts.js?v=mol05yel"></script>
+    <script src="firebase/missions.js?v=mol05yel"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -138,15 +138,19 @@
         const fullHTML = buildGameHTML(game);
 
         // 5. Renderiza no iframe
+        frame.onload = () => {
+            loader.classList.add('hidden');
+            backBtn.classList.add('visible');
+        };
+
         frame.srcdoc = fullHTML;
         frame.style.display = 'block';
 
-        frame.onload = () => {
-            setTimeout(() => {
-                loader.classList.add('hidden');
-                backBtn.classList.add('visible');
-            }, 300);
-        };
+        // Fallback para caso o onload falhe em algum navegador
+        setTimeout(() => {
+            loader.classList.add('hidden');
+            backBtn.classList.add('visible');
+        }, 1500);
 
     } catch (e) {
         console.error("Erro ao carregar jogo:", e);
