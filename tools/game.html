@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <script>(function(){var b=document.createElement("base");b.href=location.pathname.indexOf("/D.G.IA/")!==-1?"/D.G.IA/":"/";document.head.prepend(b)})()</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carregando Jogo... - D.G.IA</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="firebase/config.js?v=mokzlcx4"></script>
+    <script src="firebase/accounts.js?v=mokzlcx4"></script>
+    <script src="firebase/missions.js?v=mokzlcx4"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0a;
+            color: #ccc;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- LOADING STATE --- */
+        #game-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0a0a0a;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+        #game-loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-spinner {
+            width: 40px; height: 40px;
+            border: 3px solid #222;
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .loader-text {
+            margin-top: 15px; font-size: 0.85rem; color: #555;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- ERROR STATE --- */
+        #game-error {
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            height: 100vh; text-align: center; padding: 30px;
+        }
+        .error-icon { font-size: 3rem; margin-bottom: 15px; }
+        .error-title { color: #ff4444; font-size: 1.3rem; margin-bottom: 10px; }
+        .error-msg { color: #666; font-size: 0.85rem; margin-bottom: 25px; }
+        .error-btn {
+            padding: 12px 30px; background: #222; color: #00ff88;
+            border: 1px solid #00ff88; cursor: pointer; font-family: monospace;
+            font-size: 0.9rem; text-decoration: none; transition: 0.2s;
+        }
+        .error-btn:hover { background: #00ff88; color: #000; }
+
+        /* --- IFRAME --- */
+        #game-frame {
+            width: 100%; height: 100vh;
+            border: none; display: none;
+        }
+
+        /* --- BACK BUTTON --- */
+        #back-btn {
+            position: fixed; top: 12px; left: 12px; z-index: 10000;
+            width: 36px; height: 36px;
+            background: rgba(0,0,0,0.7); border: 1px solid #333;
+            border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; opacity: 0;
+            pointer-events: none;
+        }
+        #back-btn.visible { opacity: 1; pointer-events: all; }
+        #back-btn:hover { background: rgba(0,255,136,0.15); border-color: #00ff88; }
+        #back-btn svg { width: 18px; height: 18px; stroke: #ccc; fill: none; stroke-width: 2; }
+    </style>
+</head>
+<body>
+
+<div id="game-loader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Carregando Jogo...</div>
+</div>
+
+<div id="game-error">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">Jogo Não Encontrado</div>
+    <div class="error-msg" id="error-detail">O jogo solicitado não existe ou foi removido.</div>
+    <a class="error-btn" href="pages/dashboard/dashboard.html">VOLTAR À CENTRAL</a>
+</div>
+
+<button id="back-btn" onclick="history.back()" title="Voltar">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+</button>
+
+<iframe id="game-frame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+
+<script>
+(async function() {
+    const loader = document.getElementById('game-loader');
+    const errorDiv = document.getElementById('game-error');
+    const errorDetail = document.getElementById('error-detail');
+    const frame = document.getElementById('game-frame');
+    const backBtn = document.getElementById('back-btn');
+
+    // 1. Pega o ID do jogo pela URL
+    const params = new URLSearchParams(window.location.search);
+    const gameId = params.get('id');
+
+    if (!gameId) {
+        showError("Nenhum ID de jogo foi informado na URL.");
+        return;
+    }
+
+    try {
+        // 2. Busca o jogo no Firebase
+        const projects = await OrdemMissions.getProjects();
+        const game = projects.find(p => p.id === gameId);
+
+        if (!game || !game.htmlCode) {
+            showError("O jogo com ID \"" + gameId + "\" não foi encontrado ou está sem código HTML.");
+            return;
+        }
+
+        // 3. Atualiza o título da aba
+        document.title = (game.name || 'Jogo') + ' - D.G.IA';
+
+        // 4. Monta o HTML completo do jogo
+        const fullHTML = buildGameHTML(game);
+
+        // 5. Renderiza no iframe
+        frame.srcdoc = fullHTML;
+        frame.style.display = 'block';
+
+        frame.onload = () => {
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                backBtn.classList.add('visible');
+            }, 300);
+        };
+
+    } catch (e) {
+        console.error("Erro ao carregar jogo:", e);
+        showError("Erro de conexão com o banco de dados.");
+    }
+
+    function showError(msg) {
+        loader.style.display = 'none';
+        errorDetail.textContent = msg;
+        errorDiv.style.display = 'flex';
+    }
+
+    function buildGameHTML(game) {
+        const cssCode = game.cssCode || '';
+        const htmlCode = game.htmlCode || '';
+        const jsCode = game.jsCode || game.logicCode || '';
+
+        return `<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>${game.name || 'Jogo'}</title>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"><\/script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"><\/script>
+    <script>
+        firebase.initializeApp({
+            apiKey: "AIzaSyBGORYD-qYb-_nlOcvRdtr4Ik7AU3vL2TQ",
+            authDomain: "ordem-1e087.firebaseapp.com",
+            databaseURL: "https://ordem-1e087-default-rtdb.firebaseio.com",
+            projectId: "ordem-1e087"
+        });
+        const db = firebase.database();
+        let playerId = localStorage.getItem('game_player_id');
+        if (!playerId) { playerId = Date.now().toString(); localStorage.setItem('game_player_id', playerId); }
+        let playerName = localStorage.getItem('user_name') || 'Jogador';
+    <\/script>
+    <style>
+${cssCode}
+    </style>
+</head>
+<body>
+${htmlCode}
+<script>
+${jsCode}
+<\/script>
+</body>
+</html>`;
+    }
+})();
+</script>
+</body>
+</html>

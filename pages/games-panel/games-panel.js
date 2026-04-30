@@ -26,7 +26,7 @@ async function loadGames() {
                 <h3><span data-icon="gamepad"></span> ${p.name}</h3>
                 <p style="font-size:0.75rem; color:#666;">ID: ${p.id}</p>
                 <div class="game-card-actions">
-                    <a href="${p.gameUrl || '#'}" class="btn-play" style="flex:1; font-size:0.8rem;">JOGAR</a>
+                    <a href="tools/game.html?id=${p.id}" class="btn-play" style="flex:1; font-size:0.8rem;">JOGAR</a>
                     <button class="btn-icon" onclick="editGame('${p.id}')" data-icon="edit"></button>
                     <button class="btn-danger-icon" onclick="tryDeleteGame('${p.id}')" data-icon="trash"></button>
                 </div>`;
@@ -45,7 +45,8 @@ async function editGame(id) {
         document.getElementById('editingId').value = p.id;
         document.getElementById('gameName').value = p.name;
         document.getElementById('gameHtml').value = p.htmlCode || '';
-        document.getElementById('gameLogic').value = p.logicCode || '';
+        document.getElementById('gameCss').value = p.cssCode || '';
+        document.getElementById('gameJs').value = p.jsCode || p.logicCode || '';
         selectedRoles = p.allowedRoles || [];
         selectedUsers = p.allowedUsers || [];
         document.getElementById('formTitle').innerHTML = '<span data-icon="edit"></span> Editar Jogo';
@@ -60,7 +61,8 @@ function resetForm() {
     document.getElementById('editingId').value = '';
     document.getElementById('gameName').value = '';
     document.getElementById('gameHtml').value = '';
-    document.getElementById('gameLogic').value = '';
+    document.getElementById('gameCss').value = '';
+    document.getElementById('gameJs').value = '';
     selectedRoles = [];
     selectedUsers = [];
     document.getElementById('formTitle').innerHTML = '<span data-icon="gamepad"></span> Novo Jogo';
@@ -72,7 +74,8 @@ function resetForm() {
 async function saveGame() {
     const name = document.getElementById('gameName').value;
     const htmlCode = document.getElementById('gameHtml').value;
-    const logicCode = document.getElementById('gameLogic').value;
+    const cssCode = document.getElementById('gameCss').value;
+    const jsCode = document.getElementById('gameJs').value;
     const editingId = document.getElementById('editingId').value;
     if (!name || !htmlCode) return showToast("Nome e HTML são obrigatórios!", true);
 
@@ -80,7 +83,8 @@ async function saveGame() {
         id: editingId || Date.now().toString(),
         name, 
         htmlCode, 
-        logicCode: logicCode || '', 
+        cssCode: cssCode || '',
+        jsCode: jsCode || '', 
         allowedRoles: selectedRoles, 
         allowedUsers: selectedUsers,
         createdAt: new Date().toISOString()

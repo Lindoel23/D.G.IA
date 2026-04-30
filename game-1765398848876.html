@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo de Energia</title>
+    <style>
+        /* --- ESTILOS GERAIS (Mantidos) --- */
+        body {
+            background-color: #050505; color: #dcdcdc;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; overflow: hidden;
+            background-image: radial-gradient(circle, #1a1a1a 0%, #000000 100%);
+            user-select: none;
+        }
+        #game-container { position: relative; width: 450px; height: 650px; perspective: 1200px; }
+
+        /* PORTA */
+        .utility-box {
+            width: 100%; height: 100%; background: #5c6163;
+            border: 4px solid #333; position: absolute;
+            top: 0; left: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            box-shadow: 15px 15px 40px rgba(0,0,0,0.9) inset;
+            transform-origin: left center;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50; transform-style: preserve-3d;
+        }
+        .utility-box::before { content: ""; position: absolute; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.2)); opacity: 0.5; }
+        .hazard-sign { border: 3px solid #b33939; padding: 10px 20px; color: #b33939; font-weight: 900; font-size: 24px; transform: rotate(-3deg); background: rgba(0,0,0,0.2); pointer-events: none; transition: opacity 0.3s; }
+        .door-subtitle { margin-top:10px; opacity:0.6; font-size:12px; transition: opacity 0.3s; }
+        .box-open .hazard-sign, .box-open .door-subtitle { opacity: 0; }
+        .door-handle { width: 25px; height: 100px; background: #222; border-radius: 5px; cursor: pointer; box-shadow: 5px 5px 10px rgba(0,0,0,0.6); transition: transform 0.3s; border-left: 3px solid #555; margin-top: 50px; z-index: 2; }
+        .door-handle:hover { background: #333; }
+        .door-handle.turned { transform: rotate(90deg); }
+        .box-open { transform: rotateY(-130deg); }
+
+        /* PAINEL INTERNO */
+        .panel-interior { width: 100%; height: 100%; background: #252525; position: absolute; top: 0; left: 0; z-index: 1; box-shadow: inset 0 0 80px #000; display: flex; flex-direction: column; align-items: center; padding: 15px; box-sizing: border-box; border: 12px solid #151515; overflow: hidden; }
+        #wire-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.7)); }
+
+        /* TELAS DE ESTADO */
+        .explosion-overlay, .success-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 40; display: none; opacity: 0; transition: opacity 2s; pointer-events: none; justify-content: center; align-items: center; flex-direction: column; }
+        .explosion-overlay { background: radial-gradient(circle, rgba(255,69,0,0.8) 0%, rgba(0,0,0,0.9) 80%); mix-blend-mode: hard-light; }
+        .success-overlay { background: radial-gradient(circle, rgba(46, 204, 113, 0.2) 0%, rgba(0,0,0,0.9) 80%); transition: opacity 1s; }
+        .explosion-overlay.active, .success-overlay.active { display: flex; opacity: 1; pointer-events: all; }
+        .explosion-overlay.active { animation: fireFlicker 0.1s infinite alternate; }
+        .explosion-text, .success-text { font-weight: bold; padding: 20px; border: 2px solid; text-shadow: 0 0 10px; background: rgba(0,0,0,0.8); text-align: center; }
+        .explosion-text { color: #fff; font-size: 30px; text-shadow: 0 0 10px #ff0000; border-color: red; }
+        .success-text { color: #2ecc71; font-size: 28px; text-shadow: 0 0 10px #2ecc71; border-color: #2ecc71; }
+
+        /* BATERIA E INTERRUPTORES */
+        .battery-container { display: flex; gap: 2px; margin-bottom: 10px; background: #111; padding: 3px; border-radius: 3px; border: 1px solid #444; }
+        .battery-segment { width: 15px; height: 10px; background: #2ecc71; transition: background 0.3s; }
+        .batt-4 { background: #f1c40f; } .batt-3 { background: #e67e22; } .batt-2 { background: #e74c3c; } .batt-dead { background: #333; opacity: 0.3; }
+
+        .breaker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px 10px; margin-top: 50px; width: 90%; position: relative; z-index: 10; }
+        .switch-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
+        .switch-id { position: absolute; top: -10px; left: 5px; font-size: 10px; color: #555; font-weight: bold; }
+        .led { width: 8px; height: 8px; background: #300; border-radius: 50%; margin-bottom: 5px; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5); transition: 0.2s; }
+        .led.on { background: #f00; box-shadow: 0 0 8px #f00; } .led.ok { background: #0f0; box-shadow: 0 0 8px #0f0; }
+
+        .switch { position: relative; display: inline-block; width: 35px; height: 60px; background-color: #0a0a0a; border: 1px solid #333; cursor: pointer; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1a1a1a; transition: .2s; border: 2px solid #444; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 29px; left: 1px; bottom: 4px; background-color: #666; transition: .2s; border-top: 2px solid #888; }
+        input:checked + .slider:before { transform: translateY(-30px); background-color: #ccc; border-top: none; border-bottom: 2px solid #888; }
+
+        /* MASTER E RESET */
+        .master-section { margin-top: auto; margin-bottom: 50px; width: 90%; background: #181818; padding: 15px; border: 1px solid #444; display: flex; flex-direction: column; align-items: center; z-index: 30; position: relative; }
+        .big-switch { width: 100px; height: 120px; }
+        .big-switch .slider:before { width: 92px; height: 40px; bottom: 5px; left: 2px; }
+        .big-switch input:checked + .slider:before { transform: translateY(-65px); background: #ff9900; }
+        #masterOverlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index: 40; display: flex; align-items: center; justify-content: center; color: #666; font-size: 12px; transition: opacity 0.5s; }
+
+        .start-btn { margin-top: 20px; width: 100%; padding: 15px; background: #222; color: #444; border: 2px solid #333; font-weight: bold; font-size: 18px; cursor: not-allowed; text-transform: uppercase; }
+        .start-btn.active { background: #27ae60; color: white; border-color: #2ecc71; cursor: pointer; box-shadow: 0 0 15px #27ae60; animation: pulse 1s infinite alternate; }
+        .admin-reset { position: absolute; bottom: 10px; width: 20px; height: 20px; background: #444; border-radius: 50%; cursor: pointer; border: 2px solid #666; opacity: 0.5; transition: 0.3s; z-index: 1000; }
+        .admin-reset:hover { opacity: 1; background: #fff; box-shadow: 0 0 10px white; }
+        .flash-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: red; opacity: 0; pointer-events: none; z-index: 100; }
+        .flash-anim { animation: flash 0.3s ease-out; }
+        @keyframes flash { 0% { opacity: 0.6; } 100% { opacity: 0; } }
+        @keyframes fireFlicker { 0% { background-color: rgba(255, 69, 0, 0.5); } 100% { background-color: rgba(255, 140, 0, 0.6); } }
+
+        /* --- NOVO MODAL CUSTOMIZADO (ADMIN) --- */
+        #customModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-box {
+            background: #111; border: 2px solid #b33939; padding: 20px; width: 80%; max-width: 300px;
+            text-align: center; box-shadow: 0 0 30px rgba(179, 57, 57, 0.3); border-radius: 8px;
+        }
+        .modal-box h3 { color: #b33939; margin-top: 0; text-transform: uppercase; font-size: 1.2rem; }
+        .modal-input {
+            width: 100%; padding: 10px; margin: 15px 0; background: #000; border: 1px solid #333;
+            color: #b33939; font-family: monospace; text-align: center; font-size: 1.2rem;
+            box-sizing: border-box; outline: none;
+        }
+        .modal-input:focus { border-color: #b33939; }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
+        .m-btn {
+            border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+            font-family: monospace; transition: 0.2s;
+        }
+        .btn-ok { background: #b33939; color: black; }
+        .btn-ok:hover { background: #ff4444; }
+        .btn-cancel { background: #333; color: #888; }
+        .btn-cancel:hover { background: #444; color: white; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="flash-overlay" id="flash"></div>
+
+    <div class="utility-box" id="door">
+        <div class="hazard-sign">ALTA TENSÃO</div>
+        <div class="door-subtitle">GERADOR AUXILIAR</div>
+        <div class="door-handle" onclick="toggleDoor()"></div>
+    </div>
+
+    <div class="panel-interior">
+        <div class="explosion-overlay" id="explosionScreen">
+            <div class="explosion-text">FALHA CRÍTICA</div>
+        </div>
+
+        <div class="success-overlay" id="successScreen">
+            <div class="success-text">SISTEMA ONLINE<br><span style="font-size: 14px; font-weight: normal;">GERADOR SINCRONIZADO</span></div>
+        </div>
+
+        <svg id="wire-layer"></svg>
+        <div style="width: 100%; text-align: center; border-bottom: 2px solid #444; padding-bottom: 5px; margin-bottom: 10px; color: #888;">
+            SEQUENCE CONTROL
+        </div>
+
+        <div class="breaker-grid" id="breakerGrid"></div>
+
+        <div class="master-section">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 10px; color: #555;">SYSTEM INTEGRITY</span>
+                <div class="battery-container">
+                    <div class="battery-segment" id="life1"></div>
+                    <div class="battery-segment" id="life2"></div>
+                    <div class="battery-segment" id="life3"></div>
+                    <div class="battery-segment" id="life4"></div>
+                    <div class="battery-segment" id="life5"></div>
+                </div>
+            </div>
+
+            <div id="masterOverlay">BLOQUEADO</div>
+            <div style="font-size: 10px; color: #ff9900; margin-bottom: 5px;">MAIN BREAKER</div>
+            <label class="switch big-switch">
+                <input type="checkbox" id="mainSwitch" disabled onchange="toggleMain()">
+                <span class="slider"></span>
+            </label>
+            <button class="start-btn" id="startBtn" onclick="winGame()">IGNITION</button>
+        </div>
+
+        <div class="admin-reset" onclick="openAdminModal()" title="System Reset"></div>
+    </div>
+</div>
+
+<!-- NOVO MODAL DE SENHA -->
+<div id="customModal">
+    <div class="modal-box">
+        <h3>Acesso Restrito</h3>
+        <p style="font-size: 0.8rem; color: #666;">Insira o código de anulação:</p>
+        <input type="password" id="adminPass" class="modal-input" placeholder="CODE">
+        <div class="modal-btns">
+            <button class="m-btn btn-cancel" onclick="closeAdminModal()">CANCEL</button>
+            <button class="m-btn btn-ok" onclick="submitReset()">RESET</button>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js?v=mokzlcx4"></script>
+<script>
+    const socket = io(); 
+    const door = document.getElementById('door');
+    const doorHandle = document.querySelector('.door-handle');
+    const grid = document.getElementById('breakerGrid');
+    const wireLayer = document.getElementById('wire-layer');
+    const flash = document.getElementById('flash');
+    const explosionScreen = document.getElementById('explosionScreen');
+    const successScreen = document.getElementById('successScreen');
+    const masterSwitch = document.getElementById('mainSwitch');
+    const masterOverlay = document.getElementById('masterOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const lives = [
+        document.getElementById('life1'), document.getElementById('life2'),
+        document.getElementById('life3'), document.getElementById('life4'), document.getElementById('life5')
+    ];
+    const SEQUENCE = [3, 7, 1, 9, 4, 0, 5, 2, 8, 6]; 
+    let isExplodedLocal = false;
+
+    function init() { createBreakers(); }
+
+    socket.on("init", (state) => {
+        if(state.wireData) renderWires(state.wireData);
+        applyState(state);
+    });
+    socket.on("gameReset", (state) => {
+        if(state.wireData) renderWires(state.wireData);
+        applyState(state);
+    });
+    socket.on("updateDoor", (isOpen) => {
+        if(isOpen) { doorHandle.classList.add('turned'); door.classList.add('box-open'); } 
+        else { doorHandle.classList.remove('turned'); door.classList.remove('box-open'); }
+    });
+    socket.on("updateSwitch", (data) => {
+        const input = document.querySelector(`input[data-id="${data.id}"]`);
+        const led = document.getElementById(`led-${data.id}`);
+        if(input) input.checked = data.status;
+        if(data.status) led.classList.add('ok'); else led.classList.remove('ok');
+    });
+    socket.on("failUpdate", (data) => {
+        triggerFlash(); updateBattery(data.count); 
+        document.querySelectorAll('.breaker-grid input').forEach(inp => inp.checked = false);
+        document.querySelectorAll('.breaker-grid .led').forEach(l => {
+            l.className = 'led'; l.classList.add('on');
+            setTimeout(() => l.classList.remove('on'), 300);
+        });
+        lockMasterUI();
+    });
+    socket.on("explosion", () => {
+        isExplodedLocal = true; updateBattery(5); 
+        explosionScreen.classList.add('active');
+        document.body.style.animation = "shake 0.2s infinite";
+    });
+    socket.on("updateMasterLock", () => unlockMasterUI());
+    socket.on("engineStarted", () => winGameUI());
+
+    function applyState(state) {
+        isExplodedLocal = state.isExploded;
+        document.body.style.animation = "none";
+        explosionScreen.classList.remove('active');
+        successScreen.classList.remove('active');
+        if(state.doorOpen) { doorHandle.classList.add('turned'); door.classList.add('box-open'); } 
+        else { doorHandle.classList.remove('turned'); door.classList.remove('box-open'); }
+        updateBattery(state.errorCount);
+        if(state.isExploded) { explosionScreen.classList.add('active'); return; }
+        state.switches.forEach((isOn, index) => {
+            const input = document.querySelector(`input[data-id="${index}"]`);
+            const led = document.getElementById(`led-${index}`);
+            if(input) { input.checked = isOn; led.className = isOn ? 'led ok' : 'led'; }
+        });
+        if(state.masterUnlocked) unlockMasterUI(); else lockMasterUI();
+        if(state.generatorOn) winGameUI(true); else { startBtn.classList.remove('active'); startBtn.innerHTML = "IGNITION"; }
+    }
+
+    function updateBattery(errorCount) {
+        const livesLeft = 5 - errorCount;
+        lives.forEach((bar, index) => {
+            if (index < livesLeft) {
+                bar.className = 'battery-segment'; 
+                if(livesLeft <= 2) bar.classList.add('batt-2'); 
+                else if(livesLeft <= 3) bar.classList.add('batt-3'); 
+                else if(livesLeft <= 4) bar.classList.add('batt-4'); 
+            } else { bar.className = 'battery-segment batt-dead'; }
+        });
+    }
+
+    function toggleDoor() { socket.emit("toggleDoor"); }
+    function handleSwitchClick(e, id) {
+        if(isExplodedLocal) { e.preventDefault(); return; }
+        const input = e.target;
+        const currentActiveCount = document.querySelectorAll('.breaker-grid input:checked').length;
+        const indexExpected = currentActiveCount - 1; 
+        if (input.checked) {
+             if (id === SEQUENCE[indexExpected]) {
+                 socket.emit("toggleSwitch", { id: id, status: true });
+                 if (currentActiveCount === 10) socket.emit("unlockMaster");
+             } else { e.preventDefault(); input.checked = false; socket.emit("triggerFail"); }
+        } else { e.preventDefault(); input.checked = true; }
+    }
+    function toggleMain() { if(!masterSwitch.disabled && masterSwitch.checked) { startBtn.classList.add('active'); startBtn.innerHTML = "START ENGINE"; } }
+    function winGame() { if(!startBtn.classList.contains('active')) return; socket.emit("startEngine"); }
+
+    // --- LÓGICA DO NOVO MODAL ---
+    const modal = document.getElementById('customModal');
+    const passInput = document.getElementById('adminPass');
+
+    function openAdminModal() {
+        modal.style.display = 'flex';
+        passInput.value = '';
+        setTimeout(() => passInput.focus(), 100);
+    }
+    function closeAdminModal() { modal.style.display = 'none'; }
+    function submitReset() {
+        if(passInput.value) socket.emit("adminReset", passInput.value);
+        closeAdminModal();
+    }
+    // Permite dar Enter para enviar
+    passInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") submitReset();
+    });
+
+    function triggerFlash() { flash.classList.remove('flash-anim'); void flash.offsetWidth; flash.classList.add('flash-anim'); }
+    function unlockMasterUI() { masterOverlay.style.opacity = '0'; masterOverlay.style.pointerEvents = 'none'; masterSwitch.disabled = false; }
+    function lockMasterUI() { masterOverlay.style.opacity = '1'; masterOverlay.style.pointerEvents = 'all'; masterSwitch.disabled = true; masterSwitch.checked = false; startBtn.classList.remove('active'); }
+    function winGameUI(instant = false) { startBtn.classList.add('active'); startBtn.innerHTML = "RUNNING..."; masterSwitch.checked = true; setTimeout(() => { successScreen.classList.add('active'); }, instant ? 0 : 1000); }
+
+    function createBreakers() {
+        for(let i=0; i<10; i++) {
+            const wrapper = document.createElement('div'); wrapper.className = 'switch-wrapper';
+            const idLabel = document.createElement('span'); idLabel.className = 'switch-id'; idLabel.innerText = i;
+            const led = document.createElement('div'); led.className = 'led'; led.id = `led-${i}`;
+            const label = document.createElement('label'); label.className = 'switch';
+            const input = document.createElement('input'); input.type = 'checkbox'; input.dataset.id = i; input.onclick = (e) => handleSwitchClick(e, i); 
+            const slider = document.createElement('span'); slider.className = 'slider';
+            label.appendChild(input); label.appendChild(slider); wrapper.appendChild(idLabel); wrapper.appendChild(led); wrapper.appendChild(label); grid.appendChild(wrapper);
+        }
+    }
+    function renderWires(wireData) {
+        let svgContent = '';
+        wireData.forEach(w => { svgContent += `<path d="${w.d}" stroke="${w.color}" stroke-width="${w.width}" fill="transparent" opacity="0.9"/>`; });
+        svgContent += `<path d="M-20 300 C 100 350, 300 250, 500 320" stroke="#000" stroke-width="6" fill="transparent"/>`;
+        wireLayer.innerHTML = svgContent;
+    }
+    init();
+</script>
+</body>
+</html>
