@@ -105,6 +105,24 @@ function startRepicking() {
     if (window.MissionSystem && window.MissionSystem.startPickingMode) window.MissionSystem.startPickingMode();
 }
 
+// --- SMOOTH UI REFRESH ---
+async function refreshMissionData() {
+    if (window.MissionSystem && window.MissionSystem.init) {
+        // Atualiza a barra de cima e os dados
+        await window.MissionSystem.init();
+        const count = document.getElementById('mission-count');
+        if (count && window.MissionSystem.missions) {
+            count.textContent = window.MissionSystem.missions.length;
+        }
+        // Força atualização da lista lateral se ela estiver visível
+        if (window.MissionSystem.renderList) {
+            window.MissionSystem.renderList('mission-content-area');
+        }
+    } else {
+        window.location.reload();
+    }
+}
+
 // --- CRUD DE MISSÕES (FIREBASE) ---
 async function saveMission() {
     const name = document.getElementById('m-name').value;
@@ -139,7 +157,7 @@ async function saveMission() {
         await OrdemMissions.createMission(missionData);
         window.showToast("Missão criada de forma excepcional!");
         closeModal('missionModal');
-        setTimeout(() => window.location.reload(), 1000);
+        await refreshMissionData();
     } catch(e) { window.showToast("Erro ao comunicar com o Satélite", true); }
 }
 
@@ -173,7 +191,7 @@ async function saveEditMission() {
         });
         window.showToast("Coordenadas atualizadas com maestria!");
         closeModal('editMissionModal');
-        setTimeout(() => window.location.reload(), 1000);
+        await refreshMissionData();
     } catch(e) { window.showToast("Falha de transmissão na edição", true); }
 }
 
@@ -183,7 +201,7 @@ async function deleteMissionConfirm() {
     try {
         await OrdemMissions.deleteMission(id);
         closeModal('editMissionModal');
-        window.location.reload();
+        await refreshMissionData();
     } catch(e) { alert("Erro ao excluir"); }
 }
 
@@ -194,7 +212,7 @@ async function saveGameTime() {
         await OrdemMissions.setGameTime(gameDate);
         window.showToast("Data atualizada!");
         closeModal('timeEditModal');
-        setTimeout(() => window.location.reload(), 500);
+        await refreshMissionData();
     } catch(e) { window.showToast("Falha ao salvar data", true); }
 }
 
