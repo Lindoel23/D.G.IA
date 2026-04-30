@@ -2,55 +2,39 @@
 /* Gerador de Jogos — Prompt adaptado para Firebase Realtime Database */
 
 const PROMPT_GAME = `CONTEXTO:
-Estou usando um sistema Hub chamado D.G.IA hospedado estaticamente no GitHub Pages, com Firebase Realtime Database como backend. Preciso criar um novo mini-game multiplayer compatível com essa plataforma.
+Estou usando um sistema Hub chamado D.G.IA hospedado no GitHub Pages (estático, sem servidor). Preciso de um mini-game cooperativo que roda via Firebase Realtime Database para sincronização em tempo real.
 
-Por favor, gere UM ÚNICO ARQUIVO HTML contendo todo o código (HTML + CSS + JS), seguindo rigorosamente estas regras:
-
----
+Gere o jogo separado em 3 BLOCOS DE CÓDIGO independentes (HTML, CSS, JS), seguindo estas regras:
 
 ### REGRAS OBRIGATÓRIAS:
 
-1. **Arquivo Único**: Tudo em um só HTML (CSS no <style>, JS no <script>).
+1. **3 Blocos Separados**: Gere exatamente 3 blocos de código: um bloco HTML (só o conteúdo do <body>), um bloco CSS (só estilos), e um bloco JS (só lógica).
 
-2. **Responsividade**: Use <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">. CSS com unidades relativas (vw, vh, %) e Flexbox/Grid.
+2. **NÃO inclua** tags <html>, <head>, <body>, <style> ou <script> nos blocos. Só o conteúdo puro de cada um.
 
-3. **Estilo**: Tema Dark (RPG/Cyberpunk). Fundo escuro, texto claro. Use variáveis CSS:
-   --accent-color: #00ff88;
-   --bg-color: #1a1a1a;
-   --card-bg: #252525;
+3. **Firebase já está disponível no JS**. As seguintes variáveis já existem quando o JS roda:
+   - db → referência do firebase.database()
+   - playerId → ID único do jogador (persistido via localStorage)
+   - playerName → nome do jogador
 
-4. **Firebase**: Use Firebase Realtime Database (compat mode). Importe:
-   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"><\/script>
-   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"><\/script>
+4. **Responsividade**: Use unidades relativas (vw, vh, %) e Flexbox/Grid.
 
-5. **Config Firebase**:
-   firebase.initializeApp({
-       apiKey: "AIzaSyBGORYD-qYb-_nlOcvRdtr4Ik7AU3vL2TQ",
-       authDomain: "ordem-1e087.firebaseapp.com",
-       databaseURL: "https://ordem-1e087-default-rtdb.firebaseio.com",
-       projectId: "ordem-1e087"
-   });
-   const db = firebase.database();
+5. **Estilo**: Tema Dark (RPG/Cyberpunk). Fundo escuro, texto claro.
 
-6. **Estrutura de dados**: Salve tudo em:
-   ordem/games/{gameId}/
-   ├── name, status, maxPlayers, createdBy, createdAt
-   ├── state/ (estado do jogo)
-   └── players/{playerId}/ (dados de cada jogador)
+6. **Estrutura de dados no Firebase**: Salve o estado compartilhado em:
+   ordem/games/{nomeDoJogo}/state/
 
-7. **Sincronização em tempo real**: Use db.ref().on('value', ...) para manter todos os jogadores sincronizados. NUNCA use polling/setInterval.
+7. **Multiplayer Automático (SEM SALAS)**: NÃO crie sistema de salas, lobbies, ou botões de "criar/entrar sala". Todos os jogadores compartilham o MESMO estado automaticamente. Quando alguém abre o jogo, ele já vê o estado atual. Quando alguém interage, todos os outros veem a mudança em tempo real. Funciona como um quadro branco compartilhado — quem entra, já está participando.
 
-8. **Sala/Room**: O jogo deve ter sistema de salas:
-   - Botão "Criar Sala" (gera ID aleatório)
-   - Campo "Entrar na Sala" (digita ID)
-   - Lobby com lista de jogadores
-   - Botão "Iniciar" (só o criador)
+8. **Sincronização**: Use db.ref().on('value', ...) para escutar mudanças em tempo real. Cada interação do jogador escreve diretamente no Firebase, e todos recebem a atualização automaticamente. NUNCA use polling/setInterval para sync.
 
-9. **Sem alert()/prompt()**: Use modais HTML. Sem dependências externas além do Firebase.
+9. **Inicialização**: Quando o primeiro jogador entra, o JS deve verificar se o estado existe no Firebase. Se não existir, cria o estado inicial. Se já existir, apenas aplica o estado atual na tela.
 
-10. **Player ID**: Use localStorage para persistir um ID local único:
-    let playerId = localStorage.getItem('game_player_id');
-    if (!playerId) { playerId = Date.now().toString(); localStorage.setItem('game_player_id', playerId); }
+10. **Sem alert()/prompt()**: Use modais HTML customizados.
+
+11. **Sem dependências externas** além do Firebase (que já está carregado).
+
+12. **Admin Reset**: Inclua um botão discreto (pequeno, canto inferior) para resetar o jogo. Ao clicar, exibe um modal pedindo senha. A senha correta é "theorder". O reset reescreve o estado inicial no Firebase, e todos os jogadores veem o jogo reiniciar automaticamente.
 
 ---
 
