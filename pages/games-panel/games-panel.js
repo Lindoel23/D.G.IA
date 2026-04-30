@@ -26,7 +26,7 @@ async function loadGames() {
                 <h3><span data-icon="gamepad"></span> ${p.name}</h3>
                 <p style="font-size:0.75rem; color:#666;">ID: ${p.id}</p>
                 <div class="game-card-actions">
-                    <a href="tools/game.html?id=${p.id}" class="btn-play" style="flex:1; font-size:0.8rem;">JOGAR</a>
+                    <a href="tools/game.html?id=${p.id}&cb=${Date.now()}" class="btn-play" style="flex:1; font-size:0.8rem;">JOGAR</a>
                     <button class="btn-icon" onclick="editGame('${p.id}')" data-icon="edit"></button>
                     <button class="btn-danger-icon" onclick="tryDeleteGame('${p.id}')" data-icon="trash"></button>
                 </div>`;

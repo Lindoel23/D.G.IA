@@ -24,7 +24,7 @@
             if (!isAdmin && !hasRoleAccess && !hasUserAccess) return;
 
             const card = document.createElement('a');
-            card.href = 'tools/game.html?id=' + p.id;
+            card.href = 'tools/game.html?id=' + p.id + '&cb=' + Date.now();
             card.className = 'card';
             card.style.textDecoration = 'none';
             card.innerHTML = `<h3><span data-icon="gamepad"></span> ${p.name}</h3><p>Clique para jogar</p>`;
