@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <script>(function(){var b=document.createElement("base");b.href=location.pathname.indexOf("/D.G.IA/")!==-1?"/D.G.IA/":"/";document.head.prepend(b)})()</script>
+    <script>
+        // Detecta base path e injeta <base> + scripts dinamicamente
+        (function(){
+            var base = location.pathname.indexOf('/D.G.IA/') !== -1 ? '/D.G.IA/' : '/';
+            var b = document.createElement('base');
+            b.href = base;
+            document.head.prepend(b);
+            // Carrega Firebase SDK e scripts locais com path correto
+            document.write('<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"><\/script>');
+            document.write('<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"><\/script>');
+            document.write('<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"><\/script>');
+            var scripts = ['firebase/config.js', 'firebase/accounts.js', 'firebase/missions.js'];
+            scripts.forEach(function(src) {
+                document.write('<script src="' + base + src + '?v=mol0h58s"><\/script>');
+            });
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Carregando Jogo... - D.G.IA</title>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="firebase/config.js?v=mol0h58s"></script>
-    <script src="firebase/accounts.js?v=mol0h58s"></script>
-    <script src="firebase/missions.js?v=mol0h58s"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
