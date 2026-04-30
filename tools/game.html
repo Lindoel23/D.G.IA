@@ -1,26 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <script>
-        // Detecta base path e injeta <base> + scripts dinamicamente
-        (function(){
-            var base = location.pathname.indexOf('/D.G.IA/') !== -1 ? '/D.G.IA/' : '/';
-            var b = document.createElement('base');
-            b.href = base;
-            document.head.prepend(b);
-            // Carrega Firebase SDK e scripts locais com path correto
-            document.write('<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"><\/script>');
-            document.write('<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"><\/script>');
-            document.write('<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"><\/script>');
-            var scripts = ['firebase/config.js', 'firebase/accounts.js', 'firebase/missions.js'];
-            scripts.forEach(function(src) {
-                document.write('<script src="' + base + src + '?v=mol0h58s"><\/script>');
-            });
-        })();
-    </script>
+    <script>(function(){var b=document.createElement("base");b.href=location.pathname.indexOf("/D.G.IA/")!==-1?"/D.G.IA/":"/";document.head.prepend(b)})()</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Carregando Jogo... - D.G.IA</title>
+
+    <!-- Firebase SDK (mesmo padrão do map.html) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="firebase/config.js?v=mol16j2h"></script>
+    <script src="firebase/accounts.js?v=mol16j2h"></script>
+    <script src="firebase/missions.js?v=mol16j2h"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -38,7 +31,7 @@
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             z-index: 9999;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.5s ease;
         }
         #game-loader.hidden { opacity: 0; pointer-events: none; }
         .loader-spinner {
@@ -51,6 +44,9 @@
         .loader-text {
             margin-top: 15px; font-size: 0.85rem; color: #555;
             letter-spacing: 2px; text-transform: uppercase;
+        }
+        .loader-debug {
+            margin-top: 8px; font-size: 0.7rem; color: #333;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -96,6 +92,7 @@
 <div id="game-loader">
     <div class="loader-spinner"></div>
     <div class="loader-text">Carregando Jogo...</div>
+    <div class="loader-debug" id="loader-debug"></div>
 </div>
 
 <div id="game-error">
@@ -115,55 +112,21 @@
 
 <script>
 (async function() {
-    const loader = document.getElementById('game-loader');
-    const errorDiv = document.getElementById('game-error');
-    const errorDetail = document.getElementById('error-detail');
-    const frame = document.getElementById('game-frame');
-    const backBtn = document.getElementById('back-btn');
+    var loader = document.getElementById('game-loader');
+    var debugEl = document.getElementById('loader-debug');
+    var errorDiv = document.getElementById('game-error');
+    var errorDetail = document.getElementById('error-detail');
+    var frame = document.getElementById('game-frame');
+    var backBtn = document.getElementById('back-btn');
 
-    // 1. Pega o ID do jogo pela URL
-    const params = new URLSearchParams(window.location.search);
-    const gameId = params.get('id');
-
-    if (!gameId) {
-        showError("Nenhum ID de jogo foi informado na URL.");
-        return;
+    function debugLog(msg) {
+        console.log('[GameRunner]', msg);
+        if (debugEl) debugEl.textContent = msg;
     }
 
-    try {
-        // 2. Busca o jogo no Firebase
-        const projects = await OrdemMissions.getProjects();
-        const game = projects.find(p => p.id === gameId);
-
-        if (!game || !game.htmlCode) {
-            showError("O jogo com ID \"" + gameId + "\" não foi encontrado ou está sem código HTML.");
-            return;
-        }
-
-        // 3. Atualiza o título da aba
-        document.title = (game.name || 'Jogo') + ' - D.G.IA';
-
-        // 4. Monta o HTML completo do jogo
-        const fullHTML = buildGameHTML(game);
-
-        // 5. Renderiza no iframe
-        frame.onload = () => {
-            loader.classList.add('hidden');
-            backBtn.classList.add('visible');
-        };
-
-        frame.srcdoc = fullHTML;
-        frame.style.display = 'block';
-
-        // Fallback para caso o onload falhe em algum navegador
-        setTimeout(() => {
-            loader.classList.add('hidden');
-            backBtn.classList.add('visible');
-        }, 1500);
-
-    } catch (e) {
-        console.error("Erro ao carregar jogo:", e);
-        showError("Erro de conexão com o banco de dados.");
+    function hideLoader() {
+        loader.classList.add('hidden');
+        backBtn.classList.add('visible');
     }
 
     function showError(msg) {
@@ -172,42 +135,85 @@
         errorDiv.style.display = 'flex';
     }
 
-    function buildGameHTML(game) {
-        const cssCode = game.cssCode || '';
-        const htmlCode = game.htmlCode || '';
-        const jsCode = game.jsCode || game.logicCode || '';
+    // 1. Pega o ID do jogo pela URL
+    var params = new URLSearchParams(window.location.search);
+    var gameId = params.get('id');
 
-        return `<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>${game.name || 'Jogo'}</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"><\/script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"><\/script>
-    <script>
-        firebase.initializeApp({
-            apiKey: "AIzaSyBGORYD-qYb-_nlOcvRdtr4Ik7AU3vL2TQ",
-            authDomain: "ordem-1e087.firebaseapp.com",
-            databaseURL: "https://ordem-1e087-default-rtdb.firebaseio.com",
-            projectId: "ordem-1e087"
-        });
-        const db = firebase.database();
-        let playerId = localStorage.getItem('game_player_id');
-        if (!playerId) { playerId = Date.now().toString(); localStorage.setItem('game_player_id', playerId); }
-        let playerName = localStorage.getItem('user_name') || 'Jogador';
-    <\/script>
-    <style>
-${cssCode}
-    </style>
-</head>
-<body>
-${htmlCode}
-<script>
-${jsCode}
-<\/script>
-</body>
-</html>`;
+    if (!gameId) {
+        showError("Nenhum ID de jogo foi informado na URL.");
+        return;
+    }
+
+    debugLog('ID: ' + gameId + ' — Conectando...');
+
+    // 2. Verifica se os módulos carregaram
+    if (typeof OrdemMissions === 'undefined') {
+        showError("Erro: módulo OrdemMissions não carregou. Verifique o console (F12).");
+        return;
+    }
+
+    try {
+        // 3. Busca o jogo no Firebase
+        debugLog('Buscando jogo no Firebase...');
+        var projects = await OrdemMissions.getProjects();
+        debugLog('Encontrados ' + projects.length + ' jogos. Procurando ID...');
+
+        var game = projects.find(function(p) { return String(p.id) === String(gameId); });
+
+        if (!game || !game.htmlCode) {
+            showError('O jogo com ID "' + gameId + '" não foi encontrado ou está sem código HTML.');
+            return;
+        }
+
+        debugLog('Jogo "' + game.name + '" encontrado! Montando...');
+
+        // 4. Atualiza o título da aba
+        document.title = (game.name || 'Jogo') + ' - D.G.IA';
+
+        // 5. Monta o HTML completo do jogo
+        var cssCode = game.cssCode || '';
+        var htmlCode = game.htmlCode || '';
+        var jsCode = game.jsCode || game.logicCode || '';
+
+        var fullHTML = '<!DOCTYPE html>\n<html lang="pt-br">\n<head>\n'
+            + '<meta charset="UTF-8">\n'
+            + '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">\n'
+            + '<title>' + (game.name || 'Jogo') + '</title>\n'
+            + '<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"><\/script>\n'
+            + '<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"><\/script>\n'
+            + '<script>\n'
+            + 'firebase.initializeApp({apiKey:"AIzaSyBGORYD-qYb-_nlOcvRdtr4Ik7AU3vL2TQ",authDomain:"ordem-1e087.firebaseapp.com",databaseURL:"https://ordem-1e087-default-rtdb.firebaseio.com",projectId:"ordem-1e087"});\n'
+            + 'var db = firebase.database();\n'
+            + 'var playerId = localStorage.getItem("game_player_id");\n'
+            + 'if (!playerId) { playerId = Date.now().toString(); localStorage.setItem("game_player_id", playerId); }\n'
+            + 'var playerName = localStorage.getItem("user_name") || "Jogador";\n'
+            + '<\/script>\n'
+            + '<style>\n' + cssCode + '\n</style>\n'
+            + '</head>\n<body>\n'
+            + htmlCode + '\n'
+            + '<script>\n' + jsCode + '\n<\/script>\n'
+            + '</body>\n</html>';
+
+        // 6. Renderiza no iframe
+        debugLog('Injetando no iframe...');
+
+        frame.onload = function() {
+            debugLog('iframe carregou!');
+            hideLoader();
+        };
+
+        frame.srcdoc = fullHTML;
+        frame.style.display = 'block';
+
+        // Fallback de segurança — 3 segundos
+        setTimeout(function() {
+            debugLog('Fallback ativado');
+            hideLoader();
+        }, 3000);
+
+    } catch (e) {
+        console.error("[GameRunner] Erro:", e);
+        showError("Erro: " + e.message);
     }
 })();
 </script>
