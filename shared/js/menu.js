@@ -47,7 +47,7 @@ async function initMenu() {
 
     userRoles.forEach(roleId => {
         const roleObj = rolesData.find(r => r.id === roleId);
-        if (roleObj) {
+        if (roleObj && Array.isArray(roleObj.permissions)) {
             if (roleObj.permissions.includes("ALL")) isSuperAdmin = true;
             roleObj.permissions.forEach(p => finalPermissions.add(p));
         }
@@ -153,14 +153,18 @@ async function initMenu() {
         document.body.style.overflow = '';
     }
 
-    triggerBtn.onclick = (e) => {
+    function handleMenuToggle(e) {
+        if (e && e.cancelable) e.preventDefault();
         e.stopPropagation();
         if (sidebar.classList.contains('open')) {
             closeMenu();
         } else {
             openMenu();
         }
-    };
+    }
+
+    triggerBtn.addEventListener('click', handleMenuToggle);
+    triggerBtn.addEventListener('touchstart', handleMenuToggle, {passive: false});
 
     closeBtn.onclick = (e) => {
         e.stopPropagation();
