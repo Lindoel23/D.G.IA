@@ -10,9 +10,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="firebase/config.js?v=mol16j2h"></script>
-    <script src="firebase/accounts.js?v=mol16j2h"></script>
-    <script src="firebase/missions.js?v=mol16j2h"></script>
+    <script src="../firebase/config.js?v=mot1xuli"></script>
+    <script src="../firebase/accounts.js?v=mot1xuli"></script>
+    <script src="../firebase/missions.js?v=mot1xuli"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -179,19 +179,19 @@
             + '<meta charset="UTF-8">\n'
             + '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">\n'
             + '<title>' + (game.name || 'Jogo') + '</title>\n'
-            + '<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"><\/script>\n'
-            + '<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"><\/script>\n'
-            + '<script>\n'
+            + '<scr' + 'ipt src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></scr' + 'ipt>\n'
+            + '<scr' + 'ipt src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></scr' + 'ipt>\n'
+            + '<scr' + 'ipt>\n'
             + 'firebase.initializeApp({apiKey:"AIzaSyBGORYD-qYb-_nlOcvRdtr4Ik7AU3vL2TQ",authDomain:"ordem-1e087.firebaseapp.com",databaseURL:"https://ordem-1e087-default-rtdb.firebaseio.com",projectId:"ordem-1e087"});\n'
             + 'var db = firebase.database();\n'
             + 'var playerId = localStorage.getItem("game_player_id");\n'
             + 'if (!playerId) { playerId = Date.now().toString(); localStorage.setItem("game_player_id", playerId); }\n'
             + 'var playerName = localStorage.getItem("user_name") || "Jogador";\n'
-            + '<\/script>\n'
+            + '</scr' + 'ipt>\n'
             + '<style>\n' + cssCode + '\n</style>\n'
             + '</head>\n<body>\n'
             + htmlCode + '\n'
-            + '<script>\n' + jsCode + '\n<\/script>\n'
+            + '<scr' + 'ipt>\n' + jsCode + '\n</scr' + 'ipt>\n'
             + '</body>\n</html>';
 
         // 6. Renderiza no iframe
