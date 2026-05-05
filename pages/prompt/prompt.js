@@ -1,45 +1,38 @@
 /* --- pages/prompt/prompt.js --- */
 /* Gerador de Jogos — Prompt adaptado para Firebase Realtime Database */
 
-const PROMPT_GAME = `CONTEXTO:
-Estou usando um sistema Hub chamado D.G.IA hospedado no GitHub Pages (estático, sem servidor). Preciso de um mini-game cooperativo que roda via Firebase Realtime Database para sincronização em tempo real.
+const PROMPT_GAME = `Atue como um Desenvolvedor Front-end Especialista em Jogos Multiplayer e crie um mini-game estilo [TEMA DO JOGO, ex: Rádio Cyberpunk/Painel de Hack] para o meu sistema de RPG.
 
-Gere o jogo separado em 3 BLOCOS DE CÓDIGO independentes (HTML, CSS, JS), seguindo estas regras:
+### REGRAS ESTRUTURAIS OBRIGATÓRIAS (D.G.IA):
 
-### REGRAS OBRIGATÓRIAS:
+1. **Blocos Puros**: Gere exatamente 3 blocos de código separados: um bloco HTML (apenas o conteúdo interno, sem tags <html>, <body> ou <head>), um bloco CSS (sem tags <style>), e um bloco JavaScript (sem tags <script>).
 
-1. **3 Blocos Separados**: Gere exatamente 3 blocos de código: um bloco HTML (só o conteúdo do <body>), um bloco CSS (só estilos), e um bloco JS (só lógica).
+2. **Variáveis Globais do Firebase**: O Firebase já está importado e inicializado na plataforma. O seu código JS não deve inicializá-lo. Você já tem acesso direto às variáveis globais:
+   - db: a referência do firebase.database()
+   - playerId: string única do jogador
+   - playerName: nome do jogador
 
-2. **NÃO inclua** tags <html>, <head>, <body>, <style> ou <script> nos blocos. Só o conteúdo puro de cada um.
+3. **Caminho Dinâmico de Banco de Dados**: Para o sistema de reset global de salas da minha plataforma funcionar, o jogo deve descobrir seu próprio ID na URL. Inicie a lógica de Firebase sempre com:
+   const urlParams = new URLSearchParams(window.parent.location.search || window.location.search);
+   const gameId = urlParams.get('id') || 'jogo_teste';
+   const GAME_PATH = \`ordem/games/\${gameId}/state\`;
+   const gameRef = db.ref(GAME_PATH);
 
-3. **Firebase já está disponível no JS**. As seguintes variáveis já existem quando o JS roda:
-   - db → referência do firebase.database()
-   - playerId → ID único do jogador (persistido via localStorage)
-   - playerName → nome do jogador
+4. **Multiplayer Automático (Single Source of Truth)**:
+   - O jogo é compartilhado. A ação de um jogador afeta todos em tempo real.
+   - Use gameRef.on('value', snap => { ... }) como o **único local** que atualiza a interface (UI). 
+   - Quando o jogador interage, apenas atualize o banco (gameRef.update(...)). Não mude o visual direto no evento de clique, deixe o Firebase responder e atualizar a tela para todos.
 
-4. **Responsividade**: Use unidades relativas (vw, vh, %) e Flexbox/Grid.
+5. **Política de Áudio (Autoplay)**: Se o jogo possuir áudio automático dependente da ação de terceiros, implemente um **Overlay de Inicialização** ('Clique para Ligar'). Quando clicado, execute .play() mutado e logo em seguida .pause() na tag de áudio, para que o navegador desbloqueie a reprodução remota de áudios pela política de segurança.
 
-5. **Estilo**: Tema Dark (RPG/Cyberpunk). Fundo escuro, texto claro.
+6. **Responsividade e Mobile**: O jogo será muito acessado via celular. Use CSS com Flexbox/Grid, unidades relativas (vw, vh) e obrigatoriamente inclua @media (max-width: 768px) adaptando o tamanho dos botões e interfaces para serem amigáveis ao toque (dedo).
 
-6. **Estrutura de dados no Firebase**: Salve o estado compartilhado em:
-   ordem/games/{nomeDoJogo}/state/
-
-7. **Multiplayer Automático (SEM SALAS)**: NÃO crie sistema de salas, lobbies, ou botões de "criar/entrar sala". Todos os jogadores compartilham o MESMO estado automaticamente. Quando alguém abre o jogo, ele já vê o estado atual. Quando alguém interage, todos os outros veem a mudança em tempo real. Funciona como um quadro branco compartilhado — quem entra, já está participando.
-
-8. **Sincronização**: Use db.ref().on('value', ...) para escutar mudanças em tempo real. Cada interação do jogador escreve diretamente no Firebase, e todos recebem a atualização automaticamente. NUNCA use polling/setInterval para sync.
-
-9. **Inicialização**: Quando o primeiro jogador entra, o JS deve verificar se o estado existe no Firebase. Se não existir, cria o estado inicial. Se já existir, apenas aplica o estado atual na tela.
-
-10. **Sem alert()/prompt()**: Use modais HTML customizados.
-
-11. **Sem dependências externas** além do Firebase (que já está carregado).
-
-12. **Admin Reset**: Inclua um botão discreto (pequeno, canto inferior) para resetar o jogo. Ao clicar, exibe um modal pedindo senha. A senha correta é "theorder". O reset reescreve o estado inicial no Firebase, e todos os jogadores veem o jogo reiniciar automaticamente.
+7. **Design e Imersão**: Tema Escuro (Dark Mode/Cyberpunk). Use cores contrastantes (ex: neon), texturas de sombra (box-shadow), gradientes suaves e evite barras de rolagem (overflow: hidden). Todo áudio ou imagem chamado no HTML deve ter caminhos relativos na pasta assets (ex: ../assets/MinhaImagem.png).
 
 ---
 
-### 🎮 IDEIA DO JOGO PARA CRIAR AGORA:
-[ESCREVA AQUI SUA IDEIA]`;
+### 🎮 MECÂNICA DO JOGO PARA CRIAR AGORA:
+[ESCREVA AQUI COMO FUNCIONA O SEU NOVO JOGO]`;
 
 document.getElementById('promptGame').value = PROMPT_GAME;
 
