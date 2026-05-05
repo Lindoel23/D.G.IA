@@ -9,9 +9,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="/D.G.IA/firebase/config.js?v=mot27s8u"></script>
-    <script src="/D.G.IA/firebase/accounts.js?v=mot27s8u"></script>
-    <script src="/D.G.IA/firebase/missions.js?v=mot27s8u"></script>
+    <script src="/D.G.IA/firebase/config.js?v=mot5pbls"></script>
+    <script src="/D.G.IA/firebase/accounts.js?v=mot5pbls"></script>
+    <script src="/D.G.IA/firebase/missions.js?v=mot5pbls"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -193,22 +193,82 @@
             + '<scr' + 'ipt>\n' + jsCode + '\n</scr' + 'ipt>\n'
             + '</body>\n</html>';
 
-        // 6. Renderiza no iframe
-        debugLog('Injetando no iframe...');
+        // --- 6. SISTEMA GLOBAL DE SALA (PRESENCE & RESET) ---
+        debugLog('Verificando presença na sala...');
+        
+        var globalDb = firebase.database();
+        var playerId = localStorage.getItem("game_player_id");
+        if (!playerId) { 
+            playerId = Date.now().toString(); 
+            localStorage.setItem("game_player_id", playerId); 
+        }
 
-        frame.onload = function() {
-            debugLog('iframe carregou!');
-            hideLoader();
-        };
+        var presenceRef = globalDb.ref('ordem/games/' + gameId + '/presence');
+        var stateRef = globalDb.ref('ordem/games/' + gameId + '/state');
+        var myPresenceRef = presenceRef.child(playerId);
+        var connectedRef = globalDb.ref('.info/connected');
+        var hasLoaded = false;
 
-        frame.srcdoc = fullHTML;
-        frame.style.display = 'block';
+        function injetarIframe() {
+            if (hasLoaded) return;
+            hasLoaded = true;
+            
+            debugLog('Injetando no iframe...');
+            frame.onload = function() {
+                debugLog('iframe carregou!');
+                hideLoader();
+            };
+            frame.srcdoc = fullHTML;
+            frame.style.display = 'block';
 
-        // Fallback de segurança — 3 segundos
+            // Fallback de segurança — 3 segundos
+            setTimeout(function() {
+                debugLog('Fallback ativado');
+                hideLoader();
+            }, 3000);
+        }
+
+        connectedRef.on('value', function(snap) {
+            if (snap.val() === true) {
+                // Ao sair (fechar aba), remove a presença
+                myPresenceRef.onDisconnect().remove();
+
+                // Se já carregou (ex: perdeu internet e reconectou), só recoloca presença
+                if (hasLoaded) {
+                    myPresenceRef.set(true);
+                    return;
+                }
+
+                presenceRef.once('value', function(presenceSnap) {
+                    var players = presenceSnap.val();
+                    var count = players ? Object.keys(players).filter(function(id) { return id !== playerId; }).length : 0;
+
+                    if (count === 0) {
+                        debugLog('Sala vazia. Limpando estado antigo...');
+                        // Limpa o estado antes de carregar o jogo para evitar flash de spoilers
+                        stateRef.remove().then(function() {
+                            myPresenceRef.set(true);
+                            injetarIframe();
+                        }).catch(function() {
+                            myPresenceRef.set(true);
+                            injetarIframe();
+                        });
+                    } else {
+                        debugLog('Sala em uso. Entrando...');
+                        myPresenceRef.set(true);
+                        injetarIframe();
+                    }
+                });
+            }
+        });
+
+        // Fallback: Se a checagem de conexão demorar mais de 5s (ex: offline), injeta de qualquer jeito
         setTimeout(function() {
-            debugLog('Fallback ativado');
-            hideLoader();
-        }, 3000);
+            if (!hasLoaded) {
+                debugLog('Timeout do Firebase. Forçando injeção...');
+                injetarIframe();
+            }
+        }, 5000);
 
     } catch (e) {
         console.error("[GameRunner] Erro:", e);
