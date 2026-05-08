@@ -144,12 +144,12 @@ h3 .icon-img { width: 24px; height: 24px; background-color: var(--accent-color);
 .menu-backdrop {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.8); /* Escurecido para compensar remoção do blur */
     z-index: 19998;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.35s ease;
-    backdrop-filter: blur(3px);
+    transition: opacity 0.3s ease;
+    /* backdrop-filter: blur(3px); Removido por causar lag severo em algumas GPUs */
 }
 .menu-backdrop.open {
     opacity: 1;
@@ -166,18 +166,17 @@ h3 .icon-img { width: 24px; height: 24px; background-color: var(--accent-color);
     background: var(--card-bg);
     border-right: 2px solid var(--accent-color);
     z-index: 19999;
-    transform: translateX(-100%);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    transform: translateX(-105%); /* -105% para garantir que a sombra não vaze na tela quando fechado */
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* box-shadow removido da transition por performance */
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 0 rgba(0,0,0,0); /* Sombra desligada ao fechar */
+    box-shadow: 15px 0 40px rgba(0,0,0,0.8); /* Sombra fixa, se move com o transform */
     box-sizing: border-box;
     overflow-y: hidden;
     overflow-x: hidden;
 }
 .menu-sidebar.open {
     transform: translateX(0);
-    box-shadow: 20px 0 60px rgba(0,0,0,0.9); /* Sombra liga apenas quando abre */
 }
 
 /* Botão Fechar do Menu Sidebar */
