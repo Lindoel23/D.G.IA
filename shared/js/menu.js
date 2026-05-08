@@ -53,10 +53,15 @@ async function initMenu() {
         }
     });
 
-    const currentPath = window.location.pathname;
+    const currentPage = window.location.pathname.split('/').pop();
     const allowedItems = ALL_MENU_ITEMS.filter(item => {
-        if (currentPath.endsWith(item.link.split('/').pop())) return false;
+        // Esconde a página em que o jogador já está
+        if (item.link.split('/').pop() === currentPage) return false;
+        // SuperAdmin vê tudo
         if (isSuperAdmin) return true;
+        // Itens comuns (Central, Mapa, Fichas, Config) aparecem para TODOS
+        if (item.group === 'common') return true;
+        // Itens admin só aparecem se o cargo do jogador tiver permissão
         return finalPermissions.has(item.link);
     });
 
