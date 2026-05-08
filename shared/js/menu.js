@@ -59,9 +59,9 @@ async function initMenu() {
         if (item.link.split('/').pop() === currentPage) return false;
         // SuperAdmin vê tudo
         if (isSuperAdmin) return true;
-        // Itens comuns (Central, Mapa, Fichas, Config) aparecem para TODOS
-        if (item.group === 'common') return true;
-        // Itens admin só aparecem se o cargo do jogador tiver permissão
+        // Central, Fichas e Configurações aparecem para TODOS
+        if (['Central', 'Fichas', 'Configurações'].includes(item.label)) return true;
+        // Os demais (Mapa Mundi e itens admin) só aparecem se o cargo do jogador tiver permissão
         return finalPermissions.has(item.link);
     });
 
