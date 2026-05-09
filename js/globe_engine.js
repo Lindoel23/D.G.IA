@@ -146,12 +146,12 @@ window.GlobeEngine = (function() {
 
             ctx.fillStyle = accent;
             ctx.globalAlpha = 0.45;
+            const dotSize = 2 * scaleFactor;
             allDots.forEach(dot => {
                 const proj = projection([dot.lng, dot.lat]);
                 if (proj) {
-                    ctx.beginPath();
-                    ctx.arc(proj[0], proj[1], 1 * scaleFactor, 0, 2 * Math.PI);
-                    ctx.fill();
+                    // Otimização: fillRect é infinitamente mais rápido que beginPath + arc + fill
+                    ctx.fillRect(proj[0] - dotSize/2, proj[1] - dotSize/2, dotSize, dotSize);
                 }
             });
             ctx.globalAlpha = 1;
