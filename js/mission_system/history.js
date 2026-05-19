@@ -17,6 +17,7 @@ window.MissionSystem.openHistory = async function() {
     setTimeout(() => overlay.classList.add('active'), 10);
     this.renderHistory();
     this.renderHistoryGlobeMarkers();
+    this.updateHistoryNotificationDot();
 };
 
 window.MissionSystem.closeHistory = function() {
@@ -116,6 +117,13 @@ window.MissionSystem.renderHistory = function() {
         const typeColor = m.type === 'primary' ? '#ff4444' : m.type === 'base' ? '#53A0D4' : '#f1c40f';
         const typeLabel = m.type === 'primary' ? 'PRINCIPAL' : m.type === 'base' ? 'BASE' : 'SECUNDÁRIA';
 
+        // Tag NOVO
+        const isViewed = (m.viewedBy || []).includes(this.userPermissions.userId);
+        let isNewHtml = '';
+        if (!isViewed) {
+            isNewHtml = `<div class="mission-rect-new-tag">NOVO</div>`;
+        }
+
         // Badge de cargo (individual)
         let roleBadgeHtml = '';
         const acc = m.accessType || 'all';
@@ -146,17 +154,23 @@ window.MissionSystem.renderHistory = function() {
 
         rect.innerHTML = `
             <div class="mission-rect-type" style="color:${typeColor}; border-color:${typeColor};">${typeLabel}</div>
+            ${isNewHtml}
             <div class="history-conclusion-tag" style="background:rgba(0,0,0,0.6); border:1px solid ${borderColor}; color:${borderColor};">${conclusionLabel}</div>
             <div class="mission-rect-name">${m.name}</div>
-            <button class="history-edit-btn" onclick="event.stopPropagation(); window.MissionSystem.openHistoryEdit('${m.id}')" title="Editar">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            </button>
             ${roleBadgeHtml}
         `;
 
         rect.onclick = () => {
+            // Marcar como visto
+            if (!isViewed) {
+                if (!m.viewedBy) m.viewedBy = [];
+                m.viewedBy.push(this.userPermissions.userId);
+                dbRef(`missionHistory/${m.id}/viewedBy`).set(m.viewedBy).catch(e => console.error('Erro viewedBy hist:', e));
+                const tag = rect.querySelector('.mission-rect-new-tag');
+                if (tag) tag.remove();
+                this.updateHistoryNotificationDot();
+            }
             this.showHistoryDetails(m);
-            // Fly to no globo
             if (window.GlobeEngine) {
                 const parsedLng = parseFloat(m.lng) || 0;
                 const parsedLat = parseFloat(m.lat) || 0;
@@ -167,6 +181,52 @@ window.MissionSystem.renderHistory = function() {
         };
         scrollBox.appendChild(rect);
     });
+
+    this.updateHistoryNotificationDot();
+};
+
+// ===== NOTIFICAÇÃO DE HISTÓRICO NÃO VISTO =====
+
+window.MissionSystem.updateHistoryNotificationDot = function() {
+    const visible = this.getFilteredHistory();
+    let unseenCount = 0;
+    visible.forEach(m => {
+        if (!(m.viewedBy || []).includes(this.userPermissions.userId)) unseenCount++;
+    });
+
+    // Bolinha no botão do relógio (histórico)
+    const clockBtn = document.getElementById('btn-history-missions');
+    if (clockBtn) {
+        let dot = clockBtn.querySelector('.notification-dot');
+        if (unseenCount > 0) {
+            if (!dot) {
+                dot = document.createElement('div');
+                dot.className = 'notification-dot';
+                clockBtn.appendChild(dot);
+            }
+        } else {
+            if (dot) dot.remove();
+        }
+    }
+
+    // Bolinha no botão de missão (trigger lateral)
+    const triggerBtn = document.querySelector('.mission-trigger');
+    if (triggerBtn) {
+        let dot = triggerBtn.querySelector('.history-notification-dot');
+        if (unseenCount > 0) {
+            if (!dot) {
+                dot = document.createElement('div');
+                dot.className = 'notification-dot history-notification-dot';
+                dot.style.top = 'auto';
+                dot.style.bottom = '5px';
+                dot.style.background = '#f1c40f';
+                dot.style.boxShadow = '0 0 8px #f1c40f';
+                triggerBtn.appendChild(dot);
+            }
+        } else {
+            if (dot) dot.remove();
+        }
+    }
 };
 
 // ===== DETALHE DO HISTÓRICO =====
@@ -238,6 +298,10 @@ window.MissionSystem.showHistoryDetails = function(mission) {
             </div>
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="document.getElementById('historyDetailModal').remove()">FECHAR</button>
+                <button class="btn-save" onclick="document.getElementById('historyDetailModal').remove(); window.MissionSystem.openHistoryEdit('${mission.id}')" style="display:flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    EDITAR
+                </button>
             </div>
         </div>
     `;

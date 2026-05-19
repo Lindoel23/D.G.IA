@@ -354,6 +354,9 @@
 }
 
 /* ===== BOTÃO HISTÓRICO NA SIDEBAR ===== */
+#btn-history-missions {
+    position: relative;
+}
 #btn-history-missions:hover {
     color: var(--accent-color) !important;
 }

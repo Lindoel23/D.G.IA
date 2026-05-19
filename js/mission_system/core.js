@@ -9,8 +9,10 @@ window.MissionSystem.init = async function() {
     await this.load();
     await this.loadUserPermissions();
     await this.loadRolesCache();
+    await this.loadHistory();
     if(this.renderGlobeMarkers) this.renderGlobeMarkers();
     if(this.updateNotificationDot) this.updateNotificationDot();
+    if(this.updateHistoryNotificationDot) this.updateHistoryNotificationDot();
     console.log(" > MissionSystem: Modo Filtro 3.0 Ativo.");
 };
 
