@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <script>(function(){var b=document.createElement("base");b.href=location.pathname.indexOf("/D.G.IA/")!==-1?"/D.G.IA/":"/";document.head.prepend(b)})()</script>
@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mapa Mundi — D.G.IA</title>
 
-    <link rel="stylesheet" href="shared/css/global.css?v=moxpq6n4">
-    <link rel="stylesheet" href="shared/css/components.css?v=moxpq6n4">
-    <link rel="stylesheet" href="css/map.css?v=moxpq6n4">
-    <link rel="stylesheet" href="css/mission_system.css?v=moxpq6n4">
+    <link rel="stylesheet" href="shared/css/global.css?v=mpc60ug0">
+    <link rel="stylesheet" href="shared/css/components.css?v=mpc60ug0">
+    <link rel="stylesheet" href="css/map.css?v=mpc60ug0">
+    <link rel="stylesheet" href="css/mission_system.css?v=mpc60ug0">
 
     <!-- Infraestrutura D.G.IA -->
-    <script src="shared/js/theme.js?v=moxpq6n4"></script>
-    <script src="shared/js/icons.js?v=moxpq6n4"></script>
-    <script src="shared/js/menu.js?v=moxpq6n4"></script>
-    <script src="shared/js/loader.js?v=moxpq6n4"></script>
+    <script src="shared/js/theme.js?v=mpc60ug0"></script>
+    <script src="shared/js/icons.js?v=mpc60ug0"></script>
+    <script src="shared/js/menu.js?v=mpc60ug0"></script>
+    <script src="shared/js/loader.js?v=mpc60ug0"></script>
 
     <!-- D3.js para projeção do globo -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -24,16 +24,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="firebase/config.js?v=moxpq6n4"></script>
-    <script src="firebase/auth.js?v=moxpq6n4"></script>
-    <script src="firebase/accounts.js?v=moxpq6n4"></script>
-    <script src="firebase/roles.js?v=moxpq6n4"></script>
-    <script src="firebase/missions.js?v=moxpq6n4"></script>
+    <script src="firebase/config.js?v=mpc60ug0"></script>
+    <script src="firebase/auth.js?v=mpc60ug0"></script>
+    <script src="firebase/accounts.js?v=mpc60ug0"></script>
+    <script src="firebase/roles.js?v=mpc60ug0"></script>
+    <script src="firebase/missions.js?v=mpc60ug0"></script>
 
     <!-- Motor do Globo + Missões -->
-    <script src="js/globe_engine.js?v=moxpq6n4"></script>
-    <script src="js/mission_system.js?v=moxpq6n4"></script>
-    <script src="js/mission_system/cover_manager.js?v=moxpq6n4"></script>
+    <script src="js/globe_engine.js?v=mpc60ug0"></script>
+    <script src="js/mission_system.js?v=mpc60ug0"></script>
+    <script src="js/mission_system/cover_manager.js?v=mpc60ug0"></script>
 </head>
 <body>
 
@@ -72,6 +72,9 @@
     <div id="mission-sidebar">
         <div style="display:flex; justify-content: space-between; align-items: center; padding-right: 15px; width: 100%; box-sizing: border-box;">
             <div class="btn-close-sidebar" onclick="toggleSidebar(false)" data-icon="arrow_right" style="margin-right:auto;"></div>
+            <button id="btn-history-missions" onclick="if(window.MissionSystem) window.MissionSystem.openHistory()" style="background:transparent; border:none; color:#888; cursor:pointer; padding:10px; margin-top:15px; display:flex; align-items:center; justify-content:center; transition:0.2s;" title="Histórico de Missões">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </button>
             <button id="btn-organize-missions" onclick="if(window.MissionSystem) window.MissionSystem.toggleOrganizeMode()" style="background:transparent; border:none; color:#888; cursor:pointer; padding:10px; margin-top:15px; display:flex; align-items:center; justify-content:center; transition:0.2s;" title="Organizar Missões">
                 <span id="organize-icon" data-icon="organize"></span>
             </button>
@@ -87,6 +90,24 @@
             <button class="btn-save" style="width: 100%; height: 40px; font-size: 0.8rem;" onclick="openMissionCreateModal()">
                 <span data-icon="plus"></span> NOVA MISSÃO
             </button>
+        </div>
+
+        <!-- OVERLAY DO HISTÓRICO DE MISSÕES -->
+        <div id="history-overlay" class="history-overlay">
+            <div class="history-header">
+                <button class="details-btn" onclick="window.MissionSystem.closeHistory()" title="Voltar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <span class="history-title">Histórico</span>
+                <div style="width:40px;"></div>
+            </div>
+            <div class="history-filter-bar">
+                <button class="history-filter-btn active" onclick="if(window.MissionSystem) window.MissionSystem.applyHistoryFilter('all')">Todos</button>
+                <button class="history-filter-btn" onclick="if(window.MissionSystem) window.MissionSystem.applyHistoryFilter('concluido')">Concluído</button>
+                <button class="history-filter-btn" onclick="if(window.MissionSystem) window.MissionSystem.applyHistoryFilter('falha')">Falha</button>
+                <button class="history-filter-btn" onclick="if(window.MissionSystem) window.MissionSystem.applyHistoryFilter('neutro')">Neutro</button>
+            </div>
+            <div id="history-scroll-box" class="history-scroll-box"></div>
         </div>
     </div>
 
@@ -257,9 +278,9 @@
         </div>
     </div>
 
-    <script src="shared/js/api-helpers.js?v=moxpq6n4"></script>
-    <script src="shared/js/toast.js?v=moxpq6n4"></script>
+    <script src="shared/js/api-helpers.js?v=mpc60ug0"></script>
+    <script src="shared/js/toast.js?v=mpc60ug0"></script>
 
-    <script src="js/map_controller.js?v=moxpq6n4"></script>
+    <script src="js/map_controller.js?v=mpc60ug0"></script>
 </body>
 </html>

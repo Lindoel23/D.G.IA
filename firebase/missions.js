@@ -65,6 +65,25 @@ window.OrdemMissions = {
         } catch (e) { return false; }
     },
 
+    // ===== HISTÓRICO DE MISSÕES =====
+
+    async getHistory() {
+        try {
+            const snap = await dbRef('missionHistory').once('value');
+            const data = snap.val();
+            if (!data) return [];
+            return Object.values(data);
+        } catch (e) { return []; }
+    },
+
+    async archiveMission(missionData) {
+        try {
+            if (!missionData.id) return false;
+            await dbRef(`missionHistory/${missionData.id}`).set(missionData);
+            return true;
+        } catch (e) { return false; }
+    },
+
     // ===== GAME TIME =====
 
     async getGameTime() {

@@ -364,6 +364,21 @@ window.MissionSystem.showDetails = function(mission) {
             </div>
         `;
     }
+    // Botão Finalizar Missão (Admin Only, não para Base)
+    let finalizeHtml = '';
+    if (isAdmin && mission.type !== 'base') {
+        finalizeHtml = `
+            <div style="margin-top:30px; padding-top:20px; border-top:1px solid #333;">
+                <button onclick="window.MissionSystem.promptFinalize('${mission.id}')" 
+                    style="width:100%; padding:12px; background:rgba(241,196,15,0.1); border:1px solid #f1c40f; color:#f1c40f; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.85rem; transition:0.2s; display:flex; align-items:center; justify-content:center; gap:8px;"
+                    onmouseover="this.style.background='rgba(241,196,15,0.2)'" onmouseout="this.style.background='rgba(241,196,15,0.1)'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Finalizar Missão
+                </button>
+            </div>
+        `;
+    }
+
     content.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
             <div>
@@ -381,6 +396,7 @@ window.MissionSystem.showDetails = function(mission) {
         <div style="font-family:monospace; color:#ccc; font-weight:bold;">${mission.locationName || "Local Desconhecido"}</div>
         ${validadeText}
         ${toggleAccessHtml}
+        ${finalizeHtml}
     `;
     if (window.isAdminUser) {
         editBtn.style.display = 'flex';

@@ -8,7 +8,8 @@ const MISSION_SYSTEM_MODULES = [
     'js/mission_system/globe.js',
     'js/mission_system/permissions.js',
     'js/mission_system/picking.js',
-    'js/mission_system/ui.js'
+    'js/mission_system/ui.js',
+    'js/mission_system/history.js'
 ];
 
 // Carregamento sequencial imediato para funcionar no contexto de `<script src="..."></script>` síncrono.

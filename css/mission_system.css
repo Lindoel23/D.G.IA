@@ -352,3 +352,126 @@
     height: 22px !important;
     background-color: currentColor !important;
 }
+
+/* ===== BOTÃO HISTÓRICO NA SIDEBAR ===== */
+#btn-history-missions:hover {
+    color: var(--accent-color) !important;
+}
+#btn-history-missions svg {
+    transition: stroke 0.2s;
+}
+#btn-history-missions:hover svg {
+    stroke: var(--accent-color);
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+/* ===== OVERLAY DO HISTÓRICO ===== */
+.history-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: var(--card-bg);
+    z-index: 13500;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: none;
+    flex-direction: column;
+    border-left: 2px solid var(--accent-color);
+}
+
+.history-overlay.active {
+    transform: translateX(0);
+}
+
+/* Header do Histórico */
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #333;
+    background: rgba(0,0,0,0.3);
+    min-height: 60px;
+    flex-shrink: 0;
+}
+
+.history-title {
+    font-weight: bold;
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    text-align: center;
+    flex: 1;
+    letter-spacing: 1px;
+}
+
+/* Filtros do Histórico */
+.history-filter-bar {
+    display: flex;
+    gap: 6px;
+    padding: 10px 15px;
+    flex-shrink: 0;
+}
+
+.history-filter-btn {
+    flex: 1;
+    background: #111;
+    border: 1px solid #333;
+    color: #888;
+    padding: 8px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+.history-filter-btn:hover { border-color: var(--accent-color); color: #fff; }
+.history-filter-btn.active {
+    background: var(--accent-color);
+    color: #000;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color) 40%, transparent);
+}
+
+/* Scroll Box do Histórico */
+.history-scroll-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding: 10px 15px 20px 15px;
+}
+.history-scroll-box::-webkit-scrollbar { width: 8px; }
+.history-scroll-box::-webkit-scrollbar-track { background: #111; }
+.history-scroll-box::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+.history-scroll-box::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+
+/* Card do Histórico — Tag de Conclusão */
+.history-conclusion-tag {
+    position: absolute;
+    bottom: 12px;
+    left: 15px;
+    font-size: 0.6rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    z-index: 5;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Responsivo Mobile */
+@media (max-width: 768px) {
+    .history-overlay {
+        border-left: none;
+        width: 100vw;
+    }
+    .history-filter-btn {
+        font-size: 0.65rem;
+        padding: 6px 0;
+    }
+}

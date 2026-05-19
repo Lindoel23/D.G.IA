@@ -13,5 +13,7 @@ Object.assign(window.MissionSystem, {
     allUsers: [],
     allRolesCache: [],
     customOrders: {},
-    targetPrefix: 'm'
+    targetPrefix: 'm',
+    history: [],
+    historyFilter: 'all'
 });

@@ -50,3 +50,9 @@ window.MissionSystem.loadRolesCache = async function() {
         this.allRolesCache = await OrdemRoles.getRoles();
     } catch(e) { console.error("Erro ao carregar roles:", e); }
 };
+
+window.MissionSystem.loadHistory = async function() {
+    try {
+        this.history = await OrdemMissions.getHistory();
+    } catch(e) { console.error("Erro ao carregar histórico:", e); }
+};
