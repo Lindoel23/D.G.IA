@@ -25,5 +25,23 @@ window.MissionSystem.renderGlobeMarkers = function() {
             };
         });
 
+    // Inclui marcadores do histórico com opacidade 0 para fade-out suave
+    const conclusionColors = { concluido: '#00ff88', falha: '#ff4444', neutro: '#888' };
+    if (this.history && this.history.length > 0) {
+        this.history
+            .filter(m => !(parseFloat(m.lng) === 0 && parseFloat(m.lat) === 0))
+            .forEach(m => {
+                markerList.push({
+                    id: m.id,
+                    name: m.name,
+                    coords: [parseFloat(m.lng), parseFloat(m.lat)],
+                    color: conclusionColors[m.conclusion] || '#888',
+                    missionData: m,
+                    targetOpacity: 0,
+                    onClick: () => {}
+                });
+            });
+    }
+
     window.GlobeEngine.setMarkers(markerList);
 };

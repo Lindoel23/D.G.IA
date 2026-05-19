@@ -39,6 +39,7 @@ window.MissionSystem.renderHistoryGlobeMarkers = function() {
     const conclusionColors = { concluido: '#00ff88', falha: '#ff4444', neutro: '#888' };
     const filteredIds = this.getFilteredHistory().map(m => m.id);
 
+    // Marcadores do histórico (visíveis conforme filtro)
     const markerList = this.history
         .filter(m => !(parseFloat(m.lng) === 0 && parseFloat(m.lat) === 0))
         .map(m => {
@@ -56,6 +57,21 @@ window.MissionSystem.renderHistoryGlobeMarkers = function() {
                     window.GlobeEngine.flyTo(marker.coords[0], marker.coords[1]);
                 }
             };
+        });
+
+    // Inclui marcadores ativos com opacidade 0 para fade-out suave
+    this.missions
+        .filter(m => !(parseFloat(m.lng) === 0 && parseFloat(m.lat) === 0))
+        .forEach(m => {
+            markerList.push({
+                id: m.id,
+                name: m.name,
+                coords: [parseFloat(m.lng), parseFloat(m.lat)],
+                color: m.type === 'primary' ? '#ff4444' : m.type === 'base' ? '#53A0D4' : '#f1c40f',
+                missionData: m,
+                targetOpacity: 0,
+                onClick: () => {}
+            });
         });
 
     window.GlobeEngine.setMarkers(markerList);
