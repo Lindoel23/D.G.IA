@@ -464,6 +464,34 @@
     letter-spacing: 0.5px;
 }
 
+/* Botão Editar no Card do Histórico */
+.history-edit-btn {
+    position: absolute;
+    top: 8px;
+    right: 55px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #444;
+    color: #aaa;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+    z-index: 6;
+}
+.history-edit-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(0,0,0,0.7);
+}
+.history-edit-btn svg {
+    pointer-events: none;
+}
+
 /* Responsivo Mobile */
 @media (max-width: 768px) {
     .history-overlay {

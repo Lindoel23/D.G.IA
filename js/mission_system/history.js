@@ -1,25 +1,63 @@
 /* --- js/mission_system/history.js --- */
-/* Módulo de Histórico de Missões — Finalização e Arquivo */
+/* Módulo de Histórico de Missões — Finalização, Arquivo e Globo */
 
 window.MissionSystem = window.MissionSystem || {};
+
+// Flag interna: indica se o histórico está aberto (para controlar o globo)
+window.MissionSystem._historyOpen = false;
 
 // ===== ABRIR / FECHAR SIDEBAR DE HISTÓRICO =====
 
 window.MissionSystem.openHistory = async function() {
+    this._historyOpen = true;
     await this.loadHistory();
     const overlay = document.getElementById('history-overlay');
     if (!overlay) return;
     overlay.style.display = 'flex';
     setTimeout(() => overlay.classList.add('active'), 10);
     this.renderHistory();
+    this.renderHistoryGlobeMarkers();
 };
 
 window.MissionSystem.closeHistory = function() {
+    this._historyOpen = false;
     const overlay = document.getElementById('history-overlay');
     if (overlay) {
         overlay.classList.remove('active');
         setTimeout(() => { overlay.style.display = 'none'; }, 300);
     }
+    // Restaurar marcadores ativos no globo
+    if (this.renderGlobeMarkers) this.renderGlobeMarkers();
+};
+
+// ===== MARCADORES DO HISTÓRICO NO GLOBO =====
+
+window.MissionSystem.renderHistoryGlobeMarkers = function() {
+    if (!window.GlobeEngine) return;
+
+    const conclusionColors = { concluido: '#00ff88', falha: '#ff4444', neutro: '#888' };
+    const filteredIds = this.getFilteredHistory().map(m => m.id);
+
+    const markerList = this.history
+        .filter(m => !(parseFloat(m.lng) === 0 && parseFloat(m.lat) === 0))
+        .map(m => {
+            const isVis = filteredIds.includes(m.id);
+            return {
+                id: m.id,
+                name: m.name,
+                coords: [parseFloat(m.lng), parseFloat(m.lat)],
+                color: conclusionColors[m.conclusion] || '#888',
+                missionData: m,
+                targetOpacity: isVis ? 1 : 0,
+                onClick: (marker) => {
+                    if (!isVis) return;
+                    this.showHistoryDetails(marker.missionData);
+                    window.GlobeEngine.flyTo(marker.coords[0], marker.coords[1]);
+                }
+            };
+        });
+
+    window.GlobeEngine.setMarkers(markerList);
 };
 
 // ===== FILTRO DO HISTÓRICO =====
@@ -33,13 +71,13 @@ window.MissionSystem.applyHistoryFilter = function(type) {
         b.classList.toggle('active', btnText === filterText);
     });
     this.renderHistory();
+    this.renderHistoryGlobeMarkers();
 };
 
 window.MissionSystem.getFilteredHistory = function() {
     const isAdmin = this.userPermissions.roles.includes('admin') || this.userPermissions.roles.includes('my_love');
 
     let filtered = this.history.filter(m => {
-        // Verificar visibilidade (mesma lógica das missões ativas)
         const acc = m.accessType || 'all';
         if (acc === 'individual' && !isAdmin) {
             const reqRoles = m.allowedRoles || [];
@@ -48,8 +86,6 @@ window.MissionSystem.getFilteredHistory = function() {
             const hasUser = reqUsers.includes(this.userPermissions.userId);
             if (!hasRole && !hasUser) return false;
         }
-
-        // Filtro por conclusão
         if (this.historyFilter === 'all') return true;
         return m.conclusion === this.historyFilter;
     });
@@ -112,10 +148,23 @@ window.MissionSystem.renderHistory = function() {
             <div class="mission-rect-type" style="color:${typeColor}; border-color:${typeColor};">${typeLabel}</div>
             <div class="history-conclusion-tag" style="background:rgba(0,0,0,0.6); border:1px solid ${borderColor}; color:${borderColor};">${conclusionLabel}</div>
             <div class="mission-rect-name">${m.name}</div>
+            <button class="history-edit-btn" onclick="event.stopPropagation(); window.MissionSystem.openHistoryEdit('${m.id}')" title="Editar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
             ${roleBadgeHtml}
         `;
 
-        rect.onclick = () => this.showHistoryDetails(m);
+        rect.onclick = () => {
+            this.showHistoryDetails(m);
+            // Fly to no globo
+            if (window.GlobeEngine) {
+                const parsedLng = parseFloat(m.lng) || 0;
+                const parsedLat = parseFloat(m.lat) || 0;
+                if (!(parsedLng === 0 && parsedLat === 0)) {
+                    window.GlobeEngine.flyTo(parsedLng, parsedLat);
+                }
+            }
+        };
         scrollBox.appendChild(rect);
     });
 };
@@ -130,7 +179,6 @@ window.MissionSystem.showHistoryDetails = function(mission) {
     const conclusionColor = conclusionColors[mission.conclusion] || '#888';
     const conclusionLabel = conclusionLabels[mission.conclusion] || 'Neutro';
 
-    // Badge de cargo nos detalhes
     const acc = mission.accessType || 'all';
     let roleDetailHtml = '';
     if ((acc === 'individual' || mission.originalAccessType === 'individual') && mission.allowedRoles && mission.allowedRoles.length > 0) {
@@ -147,6 +195,12 @@ window.MissionSystem.showHistoryDetails = function(mission) {
                 </div>
             </div>
         `;
+    }
+
+    // Texto de conclusão (pode estar vazio)
+    let conclusionTextHtml = '';
+    if (mission.conclusionText) {
+        conclusionTextHtml = `<div class="detail-text" style="border-color:${conclusionColor};">${mission.conclusionText}</div>`;
     }
 
     let modal = document.getElementById('historyDetailModal');
@@ -180,7 +234,7 @@ window.MissionSystem.showHistoryDetails = function(mission) {
                     <div style="width:10px; height:10px; background:${conclusionColor}; border-radius:50%; box-shadow:0 0 10px ${conclusionColor};"></div>
                     <span style="color:${conclusionColor}; font-weight:bold;">${conclusionLabel}</span>
                 </div>
-                <div class="detail-text" style="border-color:${conclusionColor};">${mission.conclusionText || ""}</div>
+                ${conclusionTextHtml}
             </div>
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="document.getElementById('historyDetailModal').remove()">FECHAR</button>
@@ -188,6 +242,106 @@ window.MissionSystem.showHistoryDetails = function(mission) {
         </div>
     `;
     document.body.appendChild(modal);
+};
+
+// ===== EDIÇÃO DO HISTÓRICO (Admin vs User) =====
+
+window.MissionSystem.openHistoryEdit = function(missionId) {
+    const mission = this.history.find(m => m.id === missionId);
+    if (!mission) return;
+
+    const isAdmin = this.userPermissions.roles.includes('admin') || this.userPermissions.roles.includes('my_love');
+    const color = mission.type === 'primary' ? '#ff4444' : mission.type === 'base' ? '#53A0D4' : '#f1c40f';
+
+    let modal = document.getElementById('historyEditModal');
+    if (modal) modal.remove();
+
+    modal = document.createElement('div');
+    modal.id = 'historyEditModal';
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.style.zIndex = '17000';
+
+    let formHtml = '';
+
+    if (isAdmin) {
+        // ADMIN: Vê tudo editável
+        formHtml = `
+            <div class="mission-form">
+                <input type="text" id="hedit-name" value="${mission.name || ''}" placeholder="Nome da Missão">
+                <textarea id="hedit-desc" placeholder="Descrição...">${mission.description || ''}</textarea>
+                <input type="text" id="hedit-location" value="${mission.locationName || ''}" placeholder="Localização">
+                <label style="font-size:0.75rem; color:#888; text-transform:uppercase; margin-top:5px;">Conclusão da Missão</label>
+                <textarea id="hedit-conclusion-text" placeholder="Descreva a conclusão..." style="height:80px;">${mission.conclusionText || ''}</textarea>
+                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Resultado</label>
+                <select id="hedit-conclusion-type">
+                    <option value="concluido" ${mission.conclusion === 'concluido' ? 'selected' : ''}>✅ Concluído</option>
+                    <option value="falha" ${mission.conclusion === 'falha' ? 'selected' : ''}>❌ Falha</option>
+                    <option value="neutro" ${mission.conclusion === 'neutro' ? 'selected' : ''}>⚪ Neutro</option>
+                </select>
+            </div>
+        `;
+    } else {
+        // USUÁRIO COMUM: Só vê a conclusão da missão
+        formHtml = `
+            <div class="mission-form">
+                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Conclusão da Missão</label>
+                <textarea id="hedit-conclusion-text" placeholder="Descreva a conclusão..." style="height:100px;">${mission.conclusionText || ''}</textarea>
+            </div>
+        `;
+    }
+
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:450px;">
+            <h3 style="margin-top:0; color:${color};">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:8px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Editar — ${mission.name}
+            </h3>
+            ${formHtml}
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="document.getElementById('historyEditModal').remove()">CANCELAR</button>
+                <button class="btn-save" onclick="window.MissionSystem.saveHistoryEdit('${missionId}', ${isAdmin})">SALVAR</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+};
+
+window.MissionSystem.saveHistoryEdit = async function(missionId, isAdmin) {
+    const changes = {};
+
+    if (isAdmin) {
+        const name = document.getElementById('hedit-name').value.trim();
+        if (!name) { if (window.showToast) window.showToast('Preencha o nome!', true); return; }
+        changes.name = name;
+        changes.description = document.getElementById('hedit-desc').value;
+        changes.locationName = document.getElementById('hedit-location').value;
+        changes.conclusionText = document.getElementById('hedit-conclusion-text').value;
+        changes.conclusion = document.getElementById('hedit-conclusion-type').value;
+    } else {
+        changes.conclusionText = document.getElementById('hedit-conclusion-text').value;
+    }
+
+    try {
+        await dbRef(`missionHistory/${missionId}`).update(changes);
+
+        const modal = document.getElementById('historyEditModal');
+        if (modal) modal.remove();
+
+        // Fechar detalhe se estiver aberto
+        const detailModal = document.getElementById('historyDetailModal');
+        if (detailModal) detailModal.remove();
+
+        if (window.showToast) window.showToast('Histórico atualizado!');
+
+        // Recarregar
+        await this.loadHistory();
+        this.renderHistory();
+        this.renderHistoryGlobeMarkers();
+    } catch (e) {
+        console.error('Erro ao salvar edição do histórico:', e);
+        if (window.showToast) window.showToast('Erro ao salvar!', true);
+    }
 };
 
 // ===== FLUXO DE FINALIZAÇÃO =====
@@ -215,11 +369,9 @@ window.MissionSystem.promptFinalize = function(missionId) {
 };
 
 window.MissionSystem.openFinalizeModal = function(missionId) {
-    // Fechar modal de confirmação
     const confirmModal = document.getElementById('confirmFinalizeModal');
     if (confirmModal) confirmModal.remove();
 
-    // Buscar dados da missão
     const mission = this.missions.find(m => m.id === missionId);
     if (!mission) return;
 
@@ -243,9 +395,9 @@ window.MissionSystem.openFinalizeModal = function(missionId) {
                 ${mission.name}
             </h3>
             <div class="mission-form">
-                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Conclusão da Missão *</label>
+                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Conclusão da Missão (Opcional)</label>
                 <textarea id="finalize-conclusion-text" placeholder="Descreva como a missão foi concluída..." style="height:100px;"></textarea>
-                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Resultado</label>
+                <label style="font-size:0.75rem; color:#888; text-transform:uppercase;">Resultado *</label>
                 <select id="finalize-conclusion-type">
                     <option value="concluido">✅ Concluído</option>
                     <option value="falha">❌ Falha</option>
@@ -265,15 +417,9 @@ window.MissionSystem.executeFinalize = async function(missionId) {
     const conclusionText = document.getElementById('finalize-conclusion-text').value.trim();
     const conclusion = document.getElementById('finalize-conclusion-type').value;
 
-    if (!conclusionText) {
-        if (window.showToast) window.showToast('Preencha a conclusão da missão!', true);
-        return;
-    }
-
     const mission = this.missions.find(m => m.id === missionId);
     if (!mission) return;
 
-    // Montar objeto do histórico (missão completa + dados de conclusão)
     const historyEntry = {
         ...mission,
         conclusion: conclusion,
@@ -282,21 +428,16 @@ window.MissionSystem.executeFinalize = async function(missionId) {
     };
 
     try {
-        // 1. Salvar no histórico
         await OrdemMissions.archiveMission(historyEntry);
-        // 2. Remover das missões ativas
         await OrdemMissions.deleteMission(missionId);
 
-        // Fechar modais e atualizar
         const modal = document.getElementById('finalizeMissionModal');
         if (modal) modal.remove();
 
-        // Fechar overlay de detalhes
         this.closeDetails();
 
         if (window.showToast) window.showToast('Missão finalizada e arquivada!');
 
-        // Recarregar dados
         await this.load();
         if (this.renderList) this.renderList('mission-content-area');
         if (this.renderGlobeMarkers) this.renderGlobeMarkers();
