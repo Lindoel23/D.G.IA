@@ -20,7 +20,11 @@
             color: #ccc;
             font-family: 'Courier New', monospace;
             height: 100vh;
+            height: 100dvh;
+            width: 100vw;
             overflow: hidden;
+            position: fixed;
+            top: 0; left: 0;
         }
 
         /* --- LOADING STATE --- */
@@ -67,8 +71,14 @@
 
         /* --- IFRAME --- */
         #game-frame {
-            width: 100%; height: 100vh;
-            border: none; display: none;
+            width: 100vw; 
+            height: 100vh;
+            height: 100dvh;
+            border: none; 
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            background: transparent;
         }
 
         /* --- BACK BUTTON --- */
