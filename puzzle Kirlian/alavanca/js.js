@@ -45,7 +45,12 @@ let localTimerValue = 900000;
 let lastSyncStamp = Date.now();
 
 // Utility de eventos de pointer/touch
-const getY = (e) => e.clientY ?? (e.touches ? e.touches[0].clientY : (e.changedTouches ? e.changedTouches[0].clientY : 0));
+const getY = (e) => {
+    if (e.clientY !== undefined) return e.clientY;
+    if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientY;
+    if (e.touches && e.touches.length > 0) return e.touches[0].clientY;
+    return 0;
+};
 
 // --- LÓGICA DE DRAG DAS ALAVANCAS DE EXECUÇÃO ---
 document.querySelectorAll('.lever-track').forEach((track, idx) => {
@@ -67,7 +72,7 @@ document.querySelectorAll('.lever-track').forEach((track, idx) => {
         if (!isDragging) return;
         const rect = track.getBoundingClientRect();
         let y = getY(e) - rect.top;
-        let percent = Math.max(0, Math.min(100, (y / rect.height) * 100));
+        let percent = Math.max(15, Math.min(85, (y / rect.height) * 100));
         handle.style.top = `${percent}%`;
     };
 
@@ -279,7 +284,7 @@ gameRef.on('value', snap => {
         localState.etapa = 0;
         updateMeterUI(0);
 
-        if (localState.fase === 3) {
+        if (localState.fase === 3 && localState.tarefaIniciada) {
             localState.fcAtiva = true;
             localState.visores = TASKS[3][0].visores;
         } else {
