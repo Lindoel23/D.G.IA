@@ -62,27 +62,8 @@ gameRef.on('value', snap => {
     currentState = state;
     currentFase = state.fase || 0;
 
-    // Sincroniza Cronômetro
-    if (state.cronometroMs !== undefined) {
-        localTimerMs = state.cronometroMs;
-        lastSyncTime = Date.now();
-    }
+    // O Timer é atualizado num loop independente (ver abaixo)
 
-    if (state.tarefaIniciada && !state.jogoEncerrado && !state.cronometroPausado && !isTimerRunning) {
-        isTimerRunning = true;
-        timerInterval = setInterval(() => {
-            let now = Date.now();
-            let elapsed = now - lastSyncTime;
-            lastSyncTime = now;
-            localTimerMs -= elapsed;
-            if (localTimerMs <= 0) localTimerMs = 0;
-            document.getElementById('timerDisplay').innerText = formatTime(localTimerMs);
-        }, 37);
-    } else if ((!state.tarefaIniciada || state.jogoEncerrado || state.cronometroPausado) && isTimerRunning) {
-        isTimerRunning = false;
-        clearInterval(timerInterval);
-        document.getElementById('timerDisplay').innerText = formatTime(localTimerMs);
-    }
 
     // Condição de fim
     if (state.jogoEncerrado) {
@@ -110,6 +91,25 @@ gameRef.on('value', snap => {
         document.getElementById('fase5-msg').style.display = 'none';
     }
 });
+
+// Loop Independente do Cronômetro
+setInterval(() => {
+    let ms = 1200000;
+    if (currentState.cronometroPausado) {
+        ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 1200000;
+    } else if (currentState.jogoEncerrado) {
+        if (currentState.timestampFim) {
+            ms = currentState.timestampFim - Date.now();
+        } else {
+            ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 1200000;
+        }
+    } else if (currentState.timestampFim) {
+        ms = currentState.timestampFim - Date.now();
+    }
+    
+    if (ms < 0) ms = 0;
+    document.getElementById('timerDisplay').innerText = formatTime(ms);
+}, 50);
 
 // Ação do Botão B
 document.getElementById('btn-confirmar').addEventListener('click', () => {
@@ -164,7 +164,7 @@ document.getElementById('btn-confirmar').addEventListener('click', () => {
 
         // Bônus de tempo via transaction
         if (isLastExec) {
-            gameRef.child('cronometroMs').transaction(t => t === null ? 900000 : t + 60000);
+            gameRef.child('timestampFim').transaction(t => t === null ? null : t + 60000);
         }
 
         triggerSuccess();
@@ -173,7 +173,7 @@ document.getElementById('btn-confirmar').addEventListener('click', () => {
     } else {
         triggerError();
         // Penalidade via transaction
-        gameRef.child('cronometroMs').transaction(t => t === null ? 900000 : (t - 30000 < 0 ? 0 : t - 30000));
+        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000);
     }
 });
 

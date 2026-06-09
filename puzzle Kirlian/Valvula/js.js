@@ -78,10 +78,7 @@ gameRef.on('value', snap => {
         document.getElementById('purple-glow-overlay').style.display = 'none';
     }
 
-    // Sincronizar Cronômetro
-    localTimerValue = state.cronometroMs !== undefined ? state.cronometroMs : 900000;
-    lastSyncStamp = Date.now();
-    updateTimerUI(localTimerValue);
+    // Timer é atualizado em loop independente
 });
 
 // Lógica de Válvulas
@@ -163,7 +160,7 @@ window.handleLiberar = function () {
         }
     } else {
         // Errou! Aplica penalidade no cronômetro global com transaction
-        gameRef.child('cronometroMs').transaction(t => t === null ? 900000 : (t - 30000 < 0 ? 0 : t - 30000));
+        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000);
 
         // Reseta as válvulas localmente para o operador tentar de novo
         resetValves();
@@ -201,19 +198,23 @@ function updateStatusDisplay(text) {
     }
 }
 
-// Loop Local do Cronômetro (interpolação suave)
+// Loop Local do Cronômetro
 setInterval(() => {
-    if (globalState.tarefaIniciada && !globalState.jogoEncerrado && !globalState.cronometroPausado && localTimerValue > 0) {
-        const now = Date.now();
-        const diff = now - lastSyncStamp;
-        localTimerValue -= diff;
-        lastSyncStamp = now;
-        if (localTimerValue < 0) localTimerValue = 0;
-        updateTimerUI(localTimerValue);
-    } else if (globalState.cronometroPausado || globalState.jogoEncerrado || !globalState.tarefaIniciada) {
-        // Atualiza lastSyncStamp mesmo parado para não pular tempo quando retomar
-        lastSyncStamp = Date.now();
+    let ms = 1200000;
+    if (globalState.cronometroPausado) {
+        ms = globalState.tempoPausadoRestante !== undefined ? globalState.tempoPausadoRestante : 1200000;
+    } else if (globalState.jogoEncerrado) {
+        if (globalState.timestampFim) {
+            ms = globalState.timestampFim - Date.now();
+        } else {
+            ms = globalState.tempoPausadoRestante !== undefined ? globalState.tempoPausadoRestante : 1200000;
+        }
+    } else if (globalState.timestampFim) {
+        ms = globalState.timestampFim - Date.now();
     }
+    
+    if (ms < 0) ms = 0;
+    updateTimerUI(ms);
 }, 50);
 
 function updateTimerUI(ms) {

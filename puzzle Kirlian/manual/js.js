@@ -79,58 +79,41 @@ let isManualOpen = false;
 // ==========================================
 // MASTER CRONÔMETRO E RENDERIZAÇÃO
 // ==========================================
-let localTimerDisplay = 900000;
-let lastUItick = Date.now();
-
 function formatTime(ms) {
+    if (ms < 0) ms = 0;
     let seconds = Math.floor(ms / 1000);
     let mins = Math.floor(seconds / 60);
     let secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    let millis = Math.floor(ms % 1000);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(millis).padStart(3, '0')}`;
 }
 
 function updateTimerUI() {
     requestAnimationFrame(updateTimerUI);
-    if (!localState.jogoEncerrado && !localState.cronometroPausado && localState.fase > 0) {
-        let now = Date.now();
-        let diff = now - lastUItick;
-        localTimerDisplay -= diff;
-        if (localTimerDisplay < 0) localTimerDisplay = 0;
+    let ms = 1200000;
+    
+    if (localState.cronometroPausado) {
+        ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+    } else if (localState.jogoEncerrado) {
+        if (localState.timestampFim) {
+            ms = localState.timestampFim - Date.now();
+        } else {
+            ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+        }
+    } else if (localState.timestampFim) {
+        ms = localState.timestampFim - Date.now();
     }
-    lastUItick = Date.now();
-    elTimer.textContent = formatTime(localTimerDisplay);
+    
+    if (ms < 0) ms = 0;
+    elTimer.textContent = formatTime(ms);
 }
 requestAnimationFrame(updateTimerUI);
-
-// Loop mestre de sincronização do tempo no Firebase (apenas a Estação 1 faz isso)
-let lastMasterTick = Date.now();
-setInterval(() => {
-    let now = Date.now();
-    let diff = now - lastMasterTick;
-    lastMasterTick = now;
-    
-    if (!localState.jogoEncerrado && !localState.cronometroPausado && localState.fase > 0) {
-        if (typeof gameRef !== 'undefined') {
-            gameRef.child('cronometroMs').transaction(current => {
-                if (current === null) return 900000;
-                let next = current - diff;
-                return next < 0 ? 0 : next;
-            });
-        }
-    }
-}, 1000);
-
-function handleEnter() {
-    localState.tarefaIniciada = true;
-    gameRef.update({ tarefaIniciada: true });
-}
 
 gameRef.on('value', (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
 
     localState = { ...data };
-    localTimerDisplay = data.cronometroMs;
 
     if (data.travasOk && !data.jogoEncerrado) {
         if (data.fase < 5) {
@@ -735,16 +718,11 @@ if (typeof gameRef !== 'undefined') {
         const state = snap.val() || {};
         localState = { ...localState, ...state };
 
-        // Sincroniza o timer local se houver uma diferença grande (ex: penalidades)
-        if (state.cronometroMs !== undefined) {
-            if (Math.abs(localTimerDisplay - state.cronometroMs) > 1500) {
-                localTimerDisplay = state.cronometroMs;
-            }
-        }
-
         // Verifica Fim de Jogo por Tempo
-        if (localState.cronometroMs <= 0 && localState.fase > 0 && !localState.jogoEncerrado) {
-            gameRef.update({ jogoEncerrado: true, tipoFim: 'derrota' });
+        if (!localState.cronometroPausado && localState.timestampFim && localState.fase > 0 && !localState.jogoEncerrado) {
+            if (localState.timestampFim - Date.now() <= 0) {
+                gameRef.update({ jogoEncerrado: true, tipoFim: 'derrota' });
+            }
         }
 
         // Auto-Avanço de Fase quando a Carapaça conclui as travas
@@ -788,7 +766,11 @@ function handleEnter() {
         } else {
             // AVANCAR
             let updates = { tarefaIniciada: true };
-            if (localState.fase === 1) updates.cronometroPausado = false;
+            if (localState.fase === 1) {
+                updates.cronometroPausado = false;
+                let tRem = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+                updates.timestampFim = Date.now() + tRem;
+            }
             if (typeof gameRef !== 'undefined') gameRef.update(updates);
         }
     }
@@ -886,7 +868,23 @@ btnFecharControle.addEventListener('click', () => {
 
 btnPausar.addEventListener('click', () => {
     const newState = !localState.cronometroPausado;
-    if (typeof gameRef !== 'undefined') gameRef.update({ cronometroPausado: newState });
+    let updates = { cronometroPausado: newState };
+    
+    if (newState) {
+        // Pausando
+        let ms = 1200000;
+        if (localState.timestampFim) {
+            ms = localState.timestampFim - Date.now();
+            if (ms < 0) ms = 0;
+        }
+        updates.tempoPausadoRestante = ms;
+    } else {
+        // Retomando
+        let ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+        updates.timestampFim = Date.now() + ms;
+    }
+
+    if (typeof gameRef !== 'undefined') gameRef.update(updates);
     btnPausar.textContent = newState ? "[RETOMAR SIMULAÇÃO]" : "[PAUSAR SIMULAÇÃO]";
 });
 
@@ -901,7 +899,8 @@ btnResetarTudo.addEventListener('click', () => {
             medidoresOk: false,
             travasOk: false,
             travasExecucao: 1,
-            cronometroMs: 900000,
+            tempoPausadoRestante: 1200000,
+            timestampFim: null,
             cronometroPausado: true,
             penalidadesMs: 0,
             tempoExtraMs: 0,

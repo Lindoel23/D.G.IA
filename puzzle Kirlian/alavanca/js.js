@@ -198,7 +198,7 @@ function validateExecution() {
         document.body.classList.add('flash-error');
         setTimeout(() => document.body.classList.remove('flash-error'), 500);
 
-        gameRef.child('cronometroMs').transaction(t => t === null ? 900000 : (t - 30000 < 0 ? 0 : t - 30000)).catch(console.error);
+        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000).catch(console.error);
     }
 }
 
@@ -232,18 +232,23 @@ function renderVisores() {
     }
 }
 
-// Loop Local do Cronômetro (interpolação suave)
+// Loop Independente do Cronômetro
 setInterval(() => {
-    if (localState.tarefaIniciada && !localState.jogoEncerrado && !localState.cronometroPausado && localTimerValue > 0) {
-        const now = Date.now();
-        const diff = now - lastSyncStamp;
-        localTimerValue -= diff;
-        lastSyncStamp = now;
-        if (localTimerValue < 0) localTimerValue = 0;
-        updateCronometro(localTimerValue);
-    } else if (localState.cronometroPausado || localState.jogoEncerrado || !localState.tarefaIniciada) {
-        lastSyncStamp = Date.now();
+    let ms = 1200000;
+    if (localState.cronometroPausado) {
+        ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+    } else if (localState.jogoEncerrado) {
+        if (localState.timestampFim) {
+            ms = localState.timestampFim - Date.now();
+        } else {
+            ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+        }
+    } else if (localState.timestampFim) {
+        ms = localState.timestampFim - Date.now();
     }
+    
+    if (ms < 0) ms = 0;
+    updateCronometro(ms);
 }, 50);
 
 // --- LISTENER DO FIREBASE (SINGLE SOURCE OF TRUTH) ---
@@ -257,9 +262,8 @@ gameRef.on('value', snap => {
     localState.tarefaIniciada = state.tarefaIniciada || false;
     localState.cronometroPausado = state.cronometroPausado || false;
 
-    localTimerValue = state.cronometroMs !== undefined ? state.cronometroMs : 900000;
-    lastSyncStamp = Date.now();
-    updateCronometro(localTimerValue);
+    localState.tempoPausadoRestante = state.tempoPausadoRestante;
+    localState.timestampFim = state.timestampFim;
 
     // Condição de Encerramento (Derrota ou Vitória)
     if (state.jogoEncerrado) {

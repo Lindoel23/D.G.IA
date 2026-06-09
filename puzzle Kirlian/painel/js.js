@@ -47,16 +47,23 @@ document.getElementById('fader-energia').addEventListener('input', e => {
 });
 
 // Animação fluida e independente para os milésimos do cronômetro
-requestAnimationFrame(function loop(time) {
-    const delta = time - lastTick;
-    lastTick = time;
-    if (isRunning) {
-        localTimerMs -= delta;
-        if (localTimerMs < 0) localTimerMs = 0;
+setInterval(() => {
+    let ms = 1200000;
+    if (currentState && currentState.cronometroPausado) {
+        ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 1200000;
+    } else if (currentState && currentState.jogoEncerrado) {
+        if (currentState.timestampFim) {
+            ms = currentState.timestampFim - Date.now();
+        } else {
+            ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 1200000;
+        }
+    } else if (currentState && currentState.timestampFim) {
+        ms = currentState.timestampFim - Date.now();
     }
-    displayTimer(localTimerMs);
-    requestAnimationFrame(loop);
-});
+    
+    if (ms < 0) ms = 0;
+    displayTimer(ms);
+}, 50);
 
 function displayTimer(ms) {
     const m = Math.floor(ms / 60000);
@@ -71,10 +78,6 @@ gameRef.on('value', snap => {
     const state = snap.val() || {};
     currentState = state;
 
-    // Sincroniza o cronômetro com o master state
-    if (state.cronometroMs != null) {
-        localTimerMs = state.cronometroMs;
-    }
     isRunning = state.fase > 0 && state.tarefaIniciada && !state.jogoEncerrado && !state.cronometroPausado;
 
     // Reseta configurações locais se houver avanço de tarefa
@@ -245,7 +248,7 @@ document.getElementById('btn-confirmar').addEventListener('click', () => {
             }
         } else {
             // Se errou a sequência, envia sinal de penalidade para o cronômetro central
-            gameRef.child('cronometroMs').transaction(t => t === null ? 900000 : (t - 30000 < 0 ? 0 : t - 30000));
+            gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000);
         }
         return;
     }
@@ -256,7 +259,7 @@ document.getElementById('btn-confirmar').addEventListener('click', () => {
         if (p === target.p && e === target.e) {
             gameRef.update({ medidoresOk: true });
         } else {
-            gameRef.child('cronometroMs').transaction(t => t === null ? 900000 : (t - 30000 < 0 ? 0 : t - 30000));
+            gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000);
         }
     }
 });
