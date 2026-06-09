@@ -136,22 +136,7 @@ gameRef.on('value', (snapshot) => {
     }
 });
 
-// CONTROLE DE ADMIN
-btnResetTop.addEventListener('dblclick', () => { modalPassword.style.display = 'flex'; });
-btnConfirmPassword.addEventListener('click', () => {
-    if (inputPassword.value === "1234") {
-        modalControl.style.display = 'flex';
-        modalPassword.style.display = 'none';
-        inputPassword.value = "";
-    } else {
-        errorPassword.textContent = "Senha Incorreta";
-    }
-});
-btnCancelPassword.addEventListener('click', () => { modalPassword.style.display = 'none'; });
-btnPausar.addEventListener('click', () => { gameRef.update({ cronometroPausado: !localState.cronometroPausado }); });
-btnResetarTudo.addEventListener('click', () => { gameRef.set({ fase: 0, cronometroMs: 900000, cronometroPausado: true, tarefaIniciada: false }); modalControl.style.display = 'none'; });
-btnFecharControle.addEventListener('click', () => { modalControl.style.display = 'none'; });
-
+// (Antigos listeners de admin foram removidos daqui para evitar duplicidade com os do final do arquivo)
 // Textos do Terminal (Briefings)
 const texts = {
     intro: `PROTOCOLO DE EMERGÊNCIA — EXTRAÇÃO DO NÚCLEO KIRLIAN
@@ -770,7 +755,9 @@ if (typeof gameRef !== 'undefined') {
                         travasOk: false,
                         travasExecucao: 1,
                         sinal: 'INICIO',
-                        sinalInicio: true
+                        sinalInicio: true,
+                        falhaCriticaResolvida: (localState.fase + 1 === 2 || localState.fase + 1 === 3) ? false : true,
+                        cadeiaPasso: 0
                     });
                 }
             }
@@ -795,7 +782,9 @@ function handleEnter() {
             if (typeof gameRef !== 'undefined') gameRef.update({ jogoEncerrado: true, tipoFim: 'vitoria' });
         } else {
             // AVANCAR
-            if (typeof gameRef !== 'undefined') gameRef.update({ tarefaIniciada: true });
+            let updates = { tarefaIniciada: true };
+            if (localState.fase === 1) updates.cronometroPausado = false;
+            if (typeof gameRef !== 'undefined') gameRef.update(updates);
         }
     }
 }
