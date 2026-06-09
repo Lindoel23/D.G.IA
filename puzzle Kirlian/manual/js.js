@@ -361,8 +361,6 @@ A estação é composta por quatro dutos verticais principais,
 cada um identificado por número da esquerda para a direita.
 Cada duto possui uma válvula de roda que pode ser girada
 para a esquerda ou para a direita quantas vezes for necessário.
-O que importa é a posição final da válvula ao acionar
-a liberação — não a ordem dos giros.
 
 Quando o Painel de Controle indicar prioridade para esta
 estação, observe o número da coluna acesa. Esse número
@@ -379,8 +377,8 @@ PROBLEMA 1 — DESESTABILIZAÇÃO DE FLUXO INTERNO
 Os sensores detectaram queda de pressão nos dutos internos
 de contenção. Para restabelecer o fluxo correto, ajuste
 as válvulas da seguinte forma:
-Válvula 3 para a esquerda, Válvula 1 para a esquerda,
-Válvula 1 para a direita e Válvula 2 para a direita.
+Válvula 1 para a esquerda, Válvula 3 para a esquerda,
+Válvula 2 para a direita e Válvula 1 para a direita.
 Acione o duto de liberação para registrar.
 
 PROBLEMA 2 — VARIAÇÃO DE PRESSÃO DETECTADA
@@ -388,7 +386,7 @@ PROBLEMA 2 — VARIAÇÃO DE PRESSÃO DETECTADA
 Uma variação fora dos parâmetros foi registrada nos dutos
 de saída. Para compensar e estabilizar o fluxo, ajuste
 as válvulas da seguinte forma:
-Válvula 4 para a direita, Válvula 2 para a direita,
+Válvula 2 para a direita, Válvula 4 para a direita,
 Válvula 3 para a esquerda e Válvula 4 para a direita.
 Acione o duto de liberação para registrar.
 
@@ -397,8 +395,8 @@ PROBLEMA 3 — REAJUSTE DE FLUXO DE CONTENÇÃO
 O sistema de contenção exige recalibração do fluxo
 para manter a estabilidade do campo Kirlian. Ajuste
 as válvulas da seguinte forma:
-Válvula 2 para a direita, Válvula 4 para a esquerda,
-Válvula 1 para a direita, Válvula 3 para a esquerda
+Válvula 4 para a esquerda, Válvula 1 para a direita,
+Válvula 3 para a esquerda, Válvula 2 para a direita
 e Válvula 2 para a esquerda.
 Acione o duto de liberação para registrar.
 
@@ -407,8 +405,8 @@ PROBLEMA 4 — SOBREPRESSÃO ESTRUTURAL
 Uma leitura de sobrepressão foi detectada nos dutos
 estruturais da carapaça. O reposicionamento das válvulas
 é necessário para evitar ruptura. Ajuste da seguinte forma:
-Válvula 1 para a direita, Válvula 2 para a esquerda,
-Válvula 3 para a direita, Válvula 4 para a direita
+Válvula 3 para a direita, Válvula 1 para a direita,
+Válvula 4 para a direita, Válvula 2 para a esquerda
 e Válvula 1 para a direita.
 Acione o duto de liberação para registrar.
 
@@ -417,8 +415,8 @@ PROBLEMA 5 — CALIBRAÇÃO INICIAL DE FLUXO
 Os dutos requerem calibração inicial antes que o processo
 de extração possa continuar com segurança. Ajuste
 as válvulas da seguinte forma:
-Válvula 1 para a esquerda, Válvula 3 para a esquerda,
-Válvula 1 novamente para a esquerda e Válvula 4 para a direita.
+Válvula 4 para a direita, Válvula 3 para a esquerda,
+Válvula 1 para a esquerda e Válvula 1 para a esquerda.
 Acione o duto de liberação para registrar.`,
 
     `ALAVANCAS DE ENERGIA — ESTAÇÃO DE CONTROLE
@@ -446,9 +444,9 @@ PROBLEMA 1 — INVERSÃO DE CARGA
 
 Uma inversão no campo energético foi detectada e precisa
 ser corrigida imediatamente. Posicione as alavancas assim:
-Alavanca 1 em Superior, Alavanca 2 em Superior,
-Alavanca 3 em Inferior, Alavanca 4 em Inferior
-e Alavanca 5 em Neutro.
+Alavanca 4 em Inferior, Alavanca 1 em Superior,
+Alavanca 5 em Neutro, Alavanca 3 em Inferior
+e Alavanca 2 em Superior.
 Acione a Alavanca de Carga para registrar.
 
 PROBLEMA 2 — NIVELAMENTO DE CARGA
@@ -456,27 +454,27 @@ PROBLEMA 2 — NIVELAMENTO DE CARGA
 A carga energética está desnivelada e precisa de ajuste
 para manter a estabilidade do campo de contenção.
 Posicione as alavancas assim:
-Alavanca 1 em Neutro, Alavanca 2 em Inferior,
-Alavanca 3 em Inferior, Alavanca 4 em Superior
-e Alavanca 5 em Inferior.
+Alavanca 5 em Inferior, Alavanca 2 em Inferior,
+Alavanca 4 em Superior, Alavanca 1 em Neutro
+e Alavanca 3 em Inferior.
 Acione a Alavanca de Carga para registrar.
 
 PROBLEMA 3 — COMPENSAÇÃO ANÔMALA DE CAMPO
 
 Uma leitura anômala exige compensação no campo energético.
 Posicione as alavancas da seguinte forma:
-Alavanca 2 em Neutro, Alavanca 1 em Superior,
-Alavanca 4 em Inferior, Alavanca 3 em Superior
-e Alavanca 5 em Inferior.
+Alavanca 4 em Inferior, Alavanca 5 em Inferior,
+Alavanca 1 em Superior, Alavanca 2 em Neutro
+e Alavanca 3 em Superior.
 Acione a Alavanca de Carga para registrar.
 
 PROBLEMA 4 — REGULAGEM DE FASE PRIMÁRIA
 
 A regulagem de fase primária é necessária para estabilizar
 o campo energético nesta etapa. Posicione assim:
-Alavanca 1 em Inferior, Alavanca 2 em Superior,
-Alavanca 3 em Neutro, Alavanca 4 em Neutro
-e Alavanca 5 em Superior.
+Alavanca 3 em Neutro, Alavanca 5 em Superior,
+Alavanca 1 em Inferior, Alavanca 4 em Neutro
+e Alavanca 2 em Superior.
 Acione a Alavanca de Carga para registrar.
 
 PROBLEMA 5 — DESCARGA CONTROLADA
@@ -484,9 +482,9 @@ PROBLEMA 5 — DESCARGA CONTROLADA
 Uma descarga de campo energético é necessária para
 estabilizar o sistema nesta etapa da operação.
 Posicione as alavancas da seguinte forma:
-Alavanca 3 em Superior, Alavanca 1 em Neutro,
-Alavanca 5 em Superior, Alavanca 2 em Inferior
-e Alavanca 4 em Neutro.
+Alavanca 2 em Inferior, Alavanca 5 em Superior,
+Alavanca 4 em Neutro, Alavanca 1 em Neutro
+e Alavanca 3 em Superior.
 Acione a Alavanca de Carga para registrar.`,
 
     `CARAPAÇA DE CONTENÇÃO — ESTAÇÃO DE CONTROLE
@@ -526,6 +524,28 @@ o procedimento correspondente nesta página. A falha deve ser
 resolvida antes que a operação normal possa continuar.
 
 Abaixo estão os procedimentos para cada falha identificada.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FALHA CRÍTICA — PAINEL DE CONTROLE
+Tipo: Interferência no Sistema de Monitoramento
+
+O sistema de monitoramento entrou em colapso parcial.
+Os indicadores luminosos estão apresentando leituras
+aleatórias e não refletem o estado real das estações.
+
+Para restaurar o painel, o operador deve executar cinco
+sequências de calibração nos medidores, confirmando cada uma.
+Cada sequência restaura uma linha do painel, da primeira
+até a última. Quando a última linha for restaurada, todos
+os indicadores piscarão duas vezes em verde e o painel
+voltará a operar normalmente.
+
+Sequência 1: PRESSÃO em 0, ENERGIA em 0. Confirmar.
+Sequência 2: PRESSÃO em 10, ENERGIA em 10. Confirmar.
+Sequência 3: PRESSÃO em 10, ENERGIA em 0. Confirmar.
+Sequência 4: PRESSÃO em 0, ENERGIA em 10. Confirmar.
+Sequência 5: PRESSÃO em 5, ENERGIA em 5. Confirmar.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -570,44 +590,22 @@ Para resolver a sobrecarga, execute três sequências de
 estabilização, acionando a Alavanca de Carga ao final de cada uma.
 
 Sequência de Estabilização 1:
-Alavanca 4 em Neutro, Alavanca 2 em Inferior,
-Alavanca 1 em Superior, Alavanca 5 em Neutro
-e Alavanca 3 em Inferior. Acione a Alavanca de Carga.
+Alavanca 1 em Superior, Alavanca 2 em Inferior,
+Alavanca 3 em Inferior, Alavanca 4 em Neutro
+e Alavanca 5 em Neutro. Acione a Alavanca de Carga.
 
 Sequência de Estabilização 2:
-Alavanca 3 em Superior, Alavanca 5 em Inferior,
-Alavanca 2 em Neutro, Alavanca 1 em Inferior
-e Alavanca 4 em Superior. Acione a Alavanca de Carga.
+Alavanca 1 em Inferior, Alavanca 2 em Neutro,
+Alavanca 3 em Superior, Alavanca 4 em Superior
+e Alavanca 5 em Inferior. Acione a Alavanca de Carga.
 
 Sequência de Estabilização 3:
-Alavanca 2 em Superior, Alavanca 4 em Neutro,
-Alavanca 5 em Superior, Alavanca 3 em Inferior
-e Alavanca 1 em Neutro. Acione a Alavanca de Carga.
+Alavanca 1 em Neutro, Alavanca 2 em Superior,
+Alavanca 3 em Inferior, Alavanca 4 em Neutro
+e Alavanca 5 em Superior. Acione a Alavanca de Carga.
 
 Após a terceira sequência, os identificadores voltarão
-ao normal e a operação pode continuar.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-FALHA CRÍTICA — PAINEL DE CONTROLE
-Tipo: Interferência no Sistema de Monitoramento
-
-O sistema de monitoramento entrou em colapso parcial.
-Os indicadores luminosos estão apresentando leituras
-aleatórias e não refletem o estado real das estações.
-
-Para restaurar o painel, o operador deve executar cinco
-sequências de calibração nos medidores, confirmando cada uma.
-Cada sequência restaura uma linha do painel, da primeira
-até a última. Quando a última linha for restaurada, todos
-os indicadores piscarão duas vezes em verde e o painel
-voltará a operar normalmente.
-
-Sequência 1: PRESSÃO em 0, ENERGIA em 0. Confirmar.
-Sequência 2: PRESSÃO em 10, ENERGIA em 10. Confirmar.
-Sequência 3: PRESSÃO em 10, ENERGIA em 0. Confirmar.
-Sequência 4: PRESSÃO em 0, ENERGIA em 10. Confirmar.
-Sequência 5: PRESSÃO em 5, ENERGIA em 5. Confirmar.`,
+ao normal e a operação pode continuar.`,
 
     `EVENTOS INESPERADOS — PROTOCOLOS ESPECIAIS
 
