@@ -1,0 +1,439 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #051005;
+    cursor: none !important;
+}
+
+#kirlian-st1-terminal {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    /* Fallback: 100vh → Override: 100dvh (celular) */
+    background-color: transparent;
+    color: #4af626;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: clamp(0.75rem, 2.5vw, 1.2rem);
+    /* Adapta entre 0.75rem e 1.2rem */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 2vw;
+    box-sizing: border-box;
+    text-shadow: 0 0 5px rgba(74, 246, 38, 0.5);
+    user-select: none;
+}
+
+/* Efeito CRT e Scanlines */
+.crt::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 9998;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+}
+
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    pointer-events: none;
+    animation: scroll 10s linear infinite;
+    box-shadow: inset 0 0 75px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes scroll {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 0 100%;
+    }
+}
+
+/* Layout Principal */
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #4af626;
+    padding-bottom: 1vh;
+    margin-bottom: 1.5vh;
+    flex-shrink: 0;
+    /* Nunca encolhe */
+}
+
+.terminal-body {
+    flex: 1 1 0;
+    min-height: 0;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    line-height: 1.4;
+    padding-right: 1vw;
+}
+
+/* Scrollbar estilo terminal no painel principal */
+.terminal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.terminal-body::-webkit-scrollbar-track {
+    background: rgba(5, 16, 5, 0.5);
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+    background: #4af626;
+    border-radius: 0;
+}
+
+.terminal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #4af626;
+    padding-top: 1vh;
+    margin-top: 1.5vh;
+    flex-shrink: 0;
+    /* Nunca encolhe */
+}
+
+/* Botões Estilo CMD */
+.cmd-btn {
+    background: transparent;
+    color: #4af626;
+    border: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: clamp(0.7rem, 2.5vw, 1.2rem);
+    cursor: none !important;
+    padding: 0.5vh 1vw;
+    text-shadow: 0 0 5px rgba(74, 246, 38, 0.5);
+    transition: background 0.1s, color 0.1s;
+}
+
+.cmd-btn:hover,
+.cmd-btn:active {
+    background: #4af626;
+    color: #051005;
+}
+
+/* Cursor Virtual (Texturizado pelo CRT) */
+#kirlian-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9990;
+    width: 25px;
+    height: 25px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><polygon points="4,4 4,20 9,15 13,24 16,23 12,14 19,14" fill="%234af626" stroke="%23051005" stroke-width="1"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    filter: drop-shadow(0 0 5px rgba(74, 246, 38, 0.8));
+    will-change: transform;
+    opacity: 1;
+    transition: opacity 0.15s;
+}
+
+#kirlian-cursor.cursor-hidden {
+    opacity: 0;
+}
+
+#st1-timer {
+    font-weight: bold;
+    font-size: clamp(0.8rem, 3vw, 1.5rem);
+}
+
+/* Sobreposições */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(5, 16, 5, 0.95);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Caixa de Símbolos */
+.overlay-box {
+    border: 2px solid #4af626;
+    padding: clamp(10px, 3vw, 30px);
+    background: #051005;
+    white-space: pre;
+    text-align: left;
+    font-size: clamp(0.7rem, 2.5vw, 1.5rem);
+    box-shadow: 0 0 20px rgba(74, 246, 38, 0.2);
+    max-width: 95vw;
+    overflow-x: auto;
+}
+
+/* Manual */
+.manual-window {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    background: #051005;
+    /* Fundo sólido para não ver o painel atrás */
+    padding: 2vw;
+    box-sizing: border-box;
+}
+
+.manual-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vh 2vw;
+    border-bottom: 2px solid #4af626;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.manual-content {
+    flex: 1 1 0;
+    min-height: 0;
+    padding: clamp(8px, 2vw, 20px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+    font-size: clamp(0.65rem, 2.2vw, 1rem);
+}
+
+.manual-content::-webkit-scrollbar {
+    display: none;
+}
+
+.manual-content::-webkit-scrollbar-track {
+    background: #051005;
+    border-left: 1px solid #4af626;
+}
+
+.manual-content::-webkit-scrollbar-thumb {
+    background: #4af626;
+}
+
+.manual-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vh 2vw;
+    border-top: 2px solid #4af626;
+    flex-shrink: 0;
+}
+
+.scroll-controls {
+    display: flex;
+    gap: clamp(8px, 2vw, 20px);
+}
+
+/* Efeito de Brilho Roxo (Fim de jogo) */
+.purple-glow,
+.purple-glow .cmd-btn,
+.purple-glow .terminal-header,
+.purple-glow .terminal-footer {
+    color: #d800ff !important;
+    text-shadow: 0 0 10px rgba(216, 0, 255, 0.8) !important;
+    border-color: #d800ff !important;
+}
+
+.purple-glow .cmd-btn:hover {
+    background: #d800ff !important;
+    color: #1a001a !important;
+}
+
+/* Responsividade: Tablets */
+@media (max-width: 768px) {
+    .scanlines {
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+        /* Sombra reduzida pra não escurecer cantos */
+    }
+
+    .terminal-header {
+        padding-bottom: 0.8vh;
+        margin-bottom: 1vh;
+    }
+
+    .terminal-footer {
+        padding-top: 0.8vh;
+        margin-top: 1vh;
+    }
+}
+
+/* Responsividade: Celulares */
+@media (max-width: 480px) {
+    .scanlines {
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+        /* Quase sem sombra no celular */
+    }
+
+    #kirlian-st1-terminal {
+        padding: 2vw 2.5vw;
+    }
+
+    .terminal-header {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .manual-header {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+}
+
+/* Responsividade: Telas muito baixas (celular landscape) */
+@media (max-height: 500px) {
+    #kirlian-st1-terminal {
+        padding: 1vh 2vw;
+    }
+
+    .terminal-header {
+        padding-bottom: 0.5vh;
+        margin-bottom: 0.5vh;
+    }
+
+    .terminal-footer {
+        padding-top: 0.5vh;
+        margin-top: 0.5vh;
+    }
+}
+
+/* Mobile: Esconder cursor virtual (toque não tem cursor) */
+@media (hover: none) and (pointer: coarse) {
+    #kirlian-cursor {
+        display: none !important;
+    }
+
+    body {
+        cursor: default !important;
+    }
+
+    .cmd-btn {
+        cursor: default !important;
+    }
+}
+
+/* ==========================================
+   FOOTER BUTTONS & MODAIS DE CONTROLE
+   ========================================== */
+
+.footer-buttons {
+    display: flex;
+    gap: 1vw;
+    align-items: center;
+}
+
+.cmd-btn-reset {
+    opacity: 0.5;
+    font-size: clamp(0.55rem, 1.8vw, 0.85rem) !important;
+}
+
+.cmd-btn-reset:hover {
+    opacity: 1;
+}
+
+/* Modal Shared */
+.modal-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(12px, 2vh, 24px);
+    white-space: normal;
+    text-align: center;
+    min-width: clamp(200px, 50vw, 400px);
+}
+
+.modal-title {
+    font-weight: bold;
+    font-size: clamp(0.8rem, 2.8vw, 1.3rem);
+    letter-spacing: 2px;
+}
+
+.cmd-input {
+    background: transparent;
+    border: 2px solid #4af626;
+    color: #4af626;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+    padding: 1vh 2vw;
+    text-align: center;
+    width: 80%;
+    outline: none;
+    text-shadow: 0 0 5px rgba(74, 246, 38, 0.5);
+    cursor: none !important;
+}
+
+.cmd-input::placeholder {
+    color: rgba(74, 246, 38, 0.3);
+}
+
+.cmd-input:focus {
+    box-shadow: 0 0 10px rgba(74, 246, 38, 0.3);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: clamp(10px, 3vw, 30px);
+}
+
+.modal-buttons-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vh, 16px);
+    width: 100%;
+    align-items: center;
+}
+
+.cmd-btn-large {
+    font-size: clamp(0.75rem, 2.5vw, 1.1rem) !important;
+    padding: 1.5vh 3vw !important;
+    border: 1px solid #4af626;
+    width: 90%;
+}
+
+.cmd-btn-danger {
+    color: #ff4444 !important;
+    border-color: #ff4444 !important;
+    text-shadow: 0 0 5px rgba(255, 68, 68, 0.5) !important;
+}
+
+.cmd-btn-danger:hover {
+    background: #ff4444 !important;
+    color: #1a0000 !important;
+}
+
+.modal-error {
+    color: #ff4444;
+    text-shadow: 0 0 8px rgba(255, 68, 68, 0.6);
+    font-weight: bold;
+    animation: errorBlink 0.3s ease-in-out 2;
+}
+
+@keyframes errorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}

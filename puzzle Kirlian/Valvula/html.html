@@ -1,0 +1,99 @@
+<div id="crt-overlay"></div>
+<div id="green-gas-overlay"></div>
+<div id="purple-glow-overlay"></div>
+
+<div class="container">
+    <div class="card header-card">
+        <div class="header-content">
+            <div class="title-block">
+                <h1>VÁLVULAS DE PRESSÃO</h1>
+            </div>
+            <div id="timer-display" class="timer">15:00.000</div>
+        </div>
+    </div>
+
+    <div class="card main-card">
+        <div class="pipes-container">
+            <!-- Válvula 1 -->
+            <div class="pipe-col">
+                <div class="pipe-label">1</div>
+                <button class="valve-btn btn-up" onpointerdown="changeValve(0, -1)" style="font-size: 28px;">←</button>
+                <div class="pipe-body">
+                    <div class="wheel" id="wheel-0">
+                        <div class="wheel-cross"></div>
+                        <div class="wheel-center"></div>
+                    </div>
+                    <div class="counter" id="counter-0">0</div>
+                </div>
+                <button class="valve-btn btn-down" onpointerdown="changeValve(0, 1)" style="font-size: 28px;">→</button>
+            </div>
+
+            <!-- Válvula 2 -->
+            <div class="pipe-col">
+                <div class="pipe-label">2</div>
+                <button class="valve-btn btn-up" onpointerdown="changeValve(1, -1)" style="font-size: 28px;">←</button>
+                <div class="pipe-body">
+                    <div class="wheel" id="wheel-1">
+                        <div class="wheel-cross"></div>
+                        <div class="wheel-center"></div>
+                    </div>
+                    <div class="counter" id="counter-1">0</div>
+                </div>
+                <button class="valve-btn btn-down" onpointerdown="changeValve(1, 1)" style="font-size: 28px;">→</button>
+            </div>
+
+            <!-- Válvula 3 -->
+            <div class="pipe-col">
+                <div class="pipe-label">3</div>
+                <button class="valve-btn btn-up" onpointerdown="changeValve(2, -1)" style="font-size: 28px;">←</button>
+                <div class="pipe-body">
+                    <div class="wheel" id="wheel-2">
+                        <div class="wheel-cross"></div>
+                        <div class="wheel-center"></div>
+                    </div>
+                    <div class="counter" id="counter-2">0</div>
+                </div>
+                <button class="valve-btn btn-down" onpointerdown="changeValve(2, 1)" style="font-size: 28px;">→</button>
+            </div>
+
+            <!-- Válvula 4 -->
+            <div class="pipe-col">
+                <div class="pipe-label">4</div>
+                <button class="valve-btn btn-up" onpointerdown="changeValve(3, -1)" style="font-size: 28px;">←</button>
+                <div class="pipe-body">
+                    <div class="wheel" id="wheel-3">
+                        <div class="wheel-cross"></div>
+                        <div class="wheel-center"></div>
+                    </div>
+                    <div class="counter" id="counter-3">0</div>
+                </div>
+                <button class="valve-btn btn-down" onpointerdown="changeValve(3, 1)" style="font-size: 28px;">→</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card controls-card">
+        <div class="horizontal-pipe">
+            <div class="horiz-pipe-label">CANO DE LIBERAÇÃO</div>
+            <div class="horiz-controls">
+                <div class="wheel wheel-horiz">
+                    <div class="wheel-cross"></div>
+                    <div class="wheel-center"></div>
+                </div>
+
+                <button id="btn-liberar" onpointerdown="handleLiberar()">
+                    LIBERAR <span class="arrow">→</span>
+                </button>
+
+                <div class="meter-container">
+                    <div class="meter-bg">
+                        <div class="meter-marks"></div>
+                    </div>
+                    <div class="meter-needle" id="meter-needle"></div>
+                    <div class="meter-center"></div>
+                    <div class="meter-value" id="meter-value">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
