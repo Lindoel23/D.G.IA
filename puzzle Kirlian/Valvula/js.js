@@ -19,7 +19,7 @@ const TARGETS = {
         exec2: { target: [1, 0, -1, -1], meter: 7 }
     },
     2: {
-        fc: { target: [0, 0, -2, 4], meter: 0 },
+        fc: { target: [0, 0, 2, -4], meter: 0 },
         normal: { target: [0, 1, -1, 2], meter: 3 }
     },
     3: {
