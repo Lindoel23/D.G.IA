@@ -19,8 +19,8 @@ const TARGETS = {
         exec2: { target: [1, 0, -1, -1], meter: 7 }
     },
     2: {
-        fc: { target: [0, 0, 2, -4], meter: 0 },
-        normal: { target: [0, 1, -1, 3], meter: 3 }
+        fc: { target: [0, 0, -2, 4], meter: 0 },
+        normal: { target: [0, 1, -1, 2], meter: 3 }
     },
     3: {
         normal: { target: [0, 1, -1, 0], meter: 9 }
@@ -164,6 +164,9 @@ window.handleLiberar = function () {
     } else {
         // Errou! Aplica penalidade no cronômetro global com transaction
         gameRef.child('cronometroMs').transaction(t => t === null ? 900000 : (t - 30000 < 0 ? 0 : t - 30000));
+
+        // Reseta as válvulas localmente para o operador tentar de novo
+        resetValves();
 
         // Efeito visual de erro rápido na tela local (vermelho rápido)
         document.body.style.backgroundColor = '#300';

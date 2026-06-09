@@ -103,12 +103,17 @@ function updateTimerUI() {
 requestAnimationFrame(updateTimerUI);
 
 // Loop mestre de sincronização do tempo no Firebase (apenas a Estação 1 faz isso)
+let lastMasterTick = Date.now();
 setInterval(() => {
+    let now = Date.now();
+    let diff = now - lastMasterTick;
+    lastMasterTick = now;
+    
     if (!localState.jogoEncerrado && !localState.cronometroPausado && localState.fase > 0) {
         if (typeof gameRef !== 'undefined') {
             gameRef.child('cronometroMs').transaction(current => {
                 if (current === null) return 900000;
-                let next = current - 1000;
+                let next = current - diff;
                 return next < 0 ? 0 : next;
             });
         }
