@@ -7,6 +7,23 @@
     outline: none;
 }
 
+/* Scrollbar Customizado */
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background: #0b0f0b;
+    border-left: 2px solid #141710;
+}
+::-webkit-scrollbar-thumb {
+    background: #2e3626;
+    border: 2px solid #0b0f0b;
+    border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #3a4230;
+}
+
 html {
     margin: 0;
     padding: 0;
