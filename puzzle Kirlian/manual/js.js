@@ -90,15 +90,15 @@ function formatTime(ms) {
 
 function updateTimerUI() {
     requestAnimationFrame(updateTimerUI);
-    let ms = 1200000;
+    let ms = 3000000;
     
     if (localState.cronometroPausado) {
-        ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+        ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
     } else if (localState.jogoEncerrado) {
         if (localState.timestampFim) {
             ms = localState.timestampFim - Date.now();
         } else {
-            ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+            ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
         }
     } else if (localState.timestampFim) {
         ms = localState.timestampFim - Date.now();
@@ -134,11 +134,11 @@ Uma anomalia de contenção foi detectada na instalação.
 O núcleo Kirlian está em risco de ruptura estrutural.
 
 A extração de emergência foi autorizada.
-Você tem 15 minutos para concluir todos os procedimentos
-e transferir o núcleo para a maleta de transporte segura.
+Você tem 50 minutos para concluir todos os procedimentos
+antes que a instabilidade atinja nível crítico.
 
-Cada etapa concluída corretamente adiciona 1 minuto ao tempo.
-Cada erro cometido remove 30 segundos.
+Cada etapa concluída corretamente adiciona 5 minutos ao tempo.
+Cada erro cometido remove 1 minuto.
 
 Leia o manual antes de iniciar. Use o botão [MANUAL]
 no canto superior direito para acessá-lo a qualquer momento.
@@ -766,7 +766,7 @@ function handleEnter() {
             let updates = { tarefaIniciada: true };
             if (localState.fase === 1) {
                 updates.cronometroPausado = false;
-                let tRem = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+                let tRem = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
                 updates.timestampFim = Date.now() + tRem;
             }
             if (typeof gameRef !== 'undefined') gameRef.update(updates);
@@ -870,7 +870,7 @@ btnPausar.addEventListener('click', () => {
     
     if (newState) {
         // Pausando
-        let ms = 1200000;
+        let ms = 3000000;
         if (localState.timestampFim) {
             ms = localState.timestampFim - Date.now();
             if (ms < 0) ms = 0;
@@ -878,7 +878,7 @@ btnPausar.addEventListener('click', () => {
         updates.tempoPausadoRestante = ms;
     } else {
         // Retomando
-        let ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+        let ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
         updates.timestampFim = Date.now() + ms;
     }
 
@@ -897,7 +897,7 @@ btnResetarTudo.addEventListener('click', () => {
             medidoresOk: false,
             travasOk: false,
             travasExecucao: 1,
-            tempoPausadoRestante: 1200000,
+            tempoPausadoRestante: 3000000,
             timestampFim: null,
             cronometroPausado: true,
             penalidadesMs: 0,

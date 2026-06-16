@@ -160,7 +160,7 @@ window.handleLiberar = function () {
         }
     } else {
         // Errou! Aplica penalidade no cronômetro global com transaction
-        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000);
+        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 60000);
 
         // Reseta as válvulas localmente para o operador tentar de novo
         resetValves();
@@ -200,14 +200,14 @@ function updateStatusDisplay(text) {
 
 // Loop Local do Cronômetro
 setInterval(() => {
-    let ms = 1200000;
+    let ms = 3000000;
     if (globalState.cronometroPausado) {
-        ms = globalState.tempoPausadoRestante !== undefined ? globalState.tempoPausadoRestante : 1200000;
+        ms = globalState.tempoPausadoRestante !== undefined ? globalState.tempoPausadoRestante : 3000000;
     } else if (globalState.jogoEncerrado) {
         if (globalState.timestampFim) {
             ms = globalState.timestampFim - Date.now();
         } else {
-            ms = globalState.tempoPausadoRestante !== undefined ? globalState.tempoPausadoRestante : 1200000;
+            ms = globalState.tempoPausadoRestante !== undefined ? globalState.tempoPausadoRestante : 3000000;
         }
     } else if (globalState.timestampFim) {
         ms = globalState.timestampFim - Date.now();

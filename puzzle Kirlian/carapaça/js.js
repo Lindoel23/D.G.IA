@@ -94,14 +94,14 @@ gameRef.on('value', snap => {
 
 // Loop Independente do Cronômetro
 setInterval(() => {
-    let ms = 1200000;
+    let ms = 3000000;
     if (currentState.cronometroPausado) {
-        ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 1200000;
+        ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 3000000;
     } else if (currentState.jogoEncerrado) {
         if (currentState.timestampFim) {
             ms = currentState.timestampFim - Date.now();
         } else {
-            ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 1200000;
+            ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 3000000;
         }
     } else if (currentState.timestampFim) {
         ms = currentState.timestampFim - Date.now();
@@ -164,7 +164,7 @@ document.getElementById('btn-confirmar').addEventListener('click', () => {
 
         // Bônus de tempo via transaction
         if (isLastExec) {
-            gameRef.child('timestampFim').transaction(t => t === null ? null : t + 60000);
+            gameRef.child('timestampFim').transaction(t => t === null ? null : t + 300000);
         }
 
         triggerSuccess();
@@ -173,7 +173,7 @@ document.getElementById('btn-confirmar').addEventListener('click', () => {
     } else {
         triggerError();
         // Penalidade via transaction
-        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000);
+        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 60000);
     }
 });
 

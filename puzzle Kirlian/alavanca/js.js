@@ -3,7 +3,7 @@ const KIRLIAN_PATH = 'ordem/puzzles/kirlian/state';
 const gameRef = db.ref(KIRLIAN_PATH);
 
 // Mapeamento de posições visuais
-const POS_MAP = { 'S': 15, 'N': 50, 'I': 85 };
+const POS_MAP = { 'S': 20, 'N': 50, 'I': 80 };
 const REVERSE_MAP = ['S', 'N', 'I'];
 
 // Dicionário de execuções por tarefa (A1 a A5)
@@ -72,7 +72,7 @@ document.querySelectorAll('.lever-track').forEach((track, idx) => {
         if (!isDragging) return;
         const rect = track.getBoundingClientRect();
         let y = getY(e) - rect.top;
-        let percent = Math.max(15, Math.min(85, (y / rect.height) * 100));
+        let percent = Math.max(20, Math.min(80, (y / rect.height) * 100));
         handle.style.top = `${percent}%`;
     };
 
@@ -203,7 +203,7 @@ function validateExecution() {
         document.body.classList.add('flash-error');
         setTimeout(() => document.body.classList.remove('flash-error'), 500);
 
-        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000).catch(console.error);
+        gameRef.child('timestampFim').transaction(t => t === null ? null : t - 60000).catch(console.error);
     }
 }
 
@@ -239,17 +239,21 @@ function renderVisores() {
 
 // Loop Independente do Cronômetro
 setInterval(() => {
-    let ms = 1200000;
+    let ms = 3000000;
     if (localState.cronometroPausado) {
-        ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+        ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
     } else if (localState.jogoEncerrado) {
         if (localState.timestampFim) {
             ms = localState.timestampFim - Date.now();
         } else {
-            ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 1200000;
+            ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
         }
     } else if (localState.timestampFim) {
-        ms = localState.timestampFim - Date.now();
+        if (Date.now() >= lastSyncStamp + 2000) {
+            ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
+        } else {
+            ms = localState.timestampFim - Date.now();
+        }
     }
     
     if (ms < 0) ms = 0;

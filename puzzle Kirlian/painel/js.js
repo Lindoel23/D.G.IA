@@ -48,14 +48,14 @@ document.getElementById('fader-energia').addEventListener('input', e => {
 
 // Animação fluida e independente para os milésimos do cronômetro
 setInterval(() => {
-    let ms = 1200000;
+    let ms = 3000000;
     if (currentState && currentState.cronometroPausado) {
-        ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 1200000;
+        ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 3000000;
     } else if (currentState && currentState.jogoEncerrado) {
         if (currentState.timestampFim) {
             ms = currentState.timestampFim - Date.now();
         } else {
-            ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 1200000;
+            ms = currentState.tempoPausadoRestante !== undefined ? currentState.tempoPausadoRestante : 3000000;
         }
     } else if (currentState && currentState.timestampFim) {
         ms = currentState.timestampFim - Date.now();
@@ -248,7 +248,7 @@ document.getElementById('btn-confirmar').addEventListener('click', () => {
             }
         } else {
             // Se errou a sequência, envia sinal de penalidade para o cronômetro central
-            gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000);
+            gameRef.child('timestampFim').transaction(t => t === null ? null : t - 60000);
         }
         return;
     }
@@ -259,7 +259,7 @@ document.getElementById('btn-confirmar').addEventListener('click', () => {
         if (p === target.p && e === target.e) {
             gameRef.update({ medidoresOk: true });
         } else {
-            gameRef.child('timestampFim').transaction(t => t === null ? null : t - 30000);
+            gameRef.child('timestampFim').transaction(t => t === null ? null : t - 60000);
         }
     }
 });
