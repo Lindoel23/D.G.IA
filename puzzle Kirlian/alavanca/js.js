@@ -249,11 +249,7 @@ setInterval(() => {
             ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
         }
     } else if (localState.timestampFim) {
-        if (Date.now() >= lastSyncStamp + 2000) {
-            ms = localState.tempoPausadoRestante !== undefined ? localState.tempoPausadoRestante : 3000000;
-        } else {
-            ms = localState.timestampFim - Date.now();
-        }
+        ms = localState.timestampFim - Date.now();
     }
     
     if (ms < 0) ms = 0;
