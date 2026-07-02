@@ -248,7 +248,7 @@ window.ProfilePicture = {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX = 1200; // Maior resolução para manipulação
+                        const MAX = 800; // Maior resolução para manipulação (Otimizado)
                         let w = img.width, h = img.height;
                         if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
                         else { if (h > MAX) { w *= MAX / h; h = MAX; } }
@@ -257,7 +257,13 @@ window.ProfilePicture = {
                         
                         // Fazemos com qualidade perfeita agora para que na hora de cortar (Passo 2) ele preserve HD
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        this.showCropModal(canvas.toDataURL('image/jpeg', 0.95));
+                        
+                        // Otimização WebP com Fallback de segurança para navegadores sem suporte
+                        let exportData = canvas.toDataURL('image/webp', 0.80);
+                        if(exportData.startsWith('data:image/png')) {
+                            exportData = canvas.toDataURL('image/jpeg', 0.80);
+                        }
+                        this.showCropModal(exportData);
                     };
                     img.src = ev.target.result;
                 };
@@ -391,8 +397,8 @@ window.ProfilePicture = {
         modal.querySelector('.pp-btn-confirm').addEventListener('click', () => {
             // Render final cropped image mapped to 5:3 ratio with Ultra High Resolution logic
             const finalCanvas = document.createElement('canvas');
-            const targetW = 600;
-            const targetH = 360;
+            const targetW = 300;
+            const targetH = 180;
             finalCanvas.width = targetW;
             finalCanvas.height = targetH;
             const ctx = finalCanvas.getContext('2d');
@@ -413,9 +419,11 @@ window.ProfilePicture = {
                 // Draw directly as rectangle
                 ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
 
-                // Exporta como JPEG comprimido para Firebase (base64 leve)
-                // Qualidade Alta (0.8) é o balanço perfeito de peso (geralmente ~50-80KB)
-                const croppedData = finalCanvas.toDataURL('image/jpeg', 0.85);
+                // Exporta otimizado para Firebase (base64 leve) em WebP com Fallback
+                let croppedData = finalCanvas.toDataURL('image/webp', 0.85);
+                if (croppedData.startsWith('data:image/png')) {
+                    croppedData = finalCanvas.toDataURL('image/jpeg', 0.85);
+                }
                 modal.remove();
                 
                 // Salva ambos: o Recortado Leve (pra carregar rapido no app) 
