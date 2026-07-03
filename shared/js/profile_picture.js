@@ -23,6 +23,12 @@ window.ProfilePicture = {
             }
             .pp-modal.active { display: flex; }
 
+            .pp-crop-wrapper {
+                position: relative;
+                width: 300px;
+                height: 180px;
+            }
+
             .pp-crop-area {
                 width: 300px;
                 height: 180px;
@@ -32,9 +38,26 @@ window.ProfilePicture = {
                 position: relative;
                 cursor: move;
                 background-color: #111;
-                background-size: cover;
-                background-position: center;
                 box-shadow: 0 0 30px rgba(0,0,0,0.6), 0 0 15px color-mix(in srgb, var(--accent-color) 20%, transparent);
+            }
+
+            /* Canvas de preview dentro do crop area */
+            .pp-crop-canvas {
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+            }
+
+            /* Overlay circular: escurece as bordas e mostra o círculo */
+            .pp-circle-overlay {
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                pointer-events: none;
+                border-radius: 6px;
+                overflow: hidden;
             }
 
             .pp-label {
@@ -143,7 +166,6 @@ window.ProfilePicture = {
             }
             .pp-btn-cancel:hover { border-color: #999; color: white; }
 
-            /* Foto Centralizada Circular no Dashboard de Config */
             .config-profile-bg {
                 position: relative;
                 width: 130px;
@@ -156,7 +178,7 @@ window.ProfilePicture = {
                 border: 3px solid var(--accent-color);
                 box-shadow: 0 5px 20px rgba(0,0,0,0.5);
                 overflow: hidden;
-                margin-bottom: 25px; /* Added spacing under the profile picture */
+                margin-bottom: 25px;
             }
             .config-profile-bg:hover {
                 filter: brightness(0.85);
@@ -170,7 +192,7 @@ window.ProfilePicture = {
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                opacity: 0.5; /* Always partially visible to show it's editable */
+                opacity: 0.5;
                 transition: opacity 0.25s;
                 color: var(--accent-color);
                 font-weight: bold;
@@ -179,7 +201,7 @@ window.ProfilePicture = {
                 backdrop-filter: blur(2px);
             }
             .config-profile-bg:hover .pp-edit-overlay {
-                opacity: 1; /* Fully visible on hover */
+                opacity: 1;
             }
             
             .config-profile-bg .pp-edit-overlay .icon-img {
@@ -207,7 +229,6 @@ window.ProfilePicture = {
         document.head.appendChild(style);
     },
 
-    // Chama Preview - Manda buscar no DB o original sem cortes
     previewModal: async function(currentImage) {
         if (!currentImage) {
             this.triggerFileInput();
@@ -217,7 +238,6 @@ window.ProfilePicture = {
         const uid = window.OrdemAuth ? OrdemAuth.getCurrentUID() : localStorage.getItem('user_id');
         if (uid) {
             try {
-                // Tenta puxar a imagem Master Intacta (se existir)
                 const masterImage = await OrdemDB.getAccountField(uid, 'profileImageMaster');
                 if (masterImage) {
                     this.showCropModal(masterImage);
@@ -226,7 +246,6 @@ window.ProfilePicture = {
             } catch (e) { console.error("Erro puxando master image", e); }
         }
         
-        // Fallback para a imagem já cortada
         this.showCropModal(currentImage);
     },
 
@@ -248,17 +267,15 @@ window.ProfilePicture = {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX = 800; // Maior resolução para manipulação (Otimizado)
+                        const MAX = 800;
                         let w = img.width, h = img.height;
                         if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
                         else { if (h > MAX) { w *= MAX / h; h = MAX; } }
                         canvas.width = w;
                         canvas.height = h;
                         
-                        // Fazemos com qualidade perfeita agora para que na hora de cortar (Passo 2) ele preserve HD
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                         
-                        // Otimização WebP com Fallback de segurança para navegadores sem suporte
                         let exportData = canvas.toDataURL('image/webp', 0.80);
                         if(exportData.startsWith('data:image/png')) {
                             exportData = canvas.toDataURL('image/jpeg', 0.80);
@@ -279,11 +296,32 @@ window.ProfilePicture = {
         this.currentDataUrl = dataUrl;
         this.cropState = { scale: 1, posX: 50, posY: 50 };
 
+        const CROP_W = 300;
+        const CROP_H = 180;
+        const CIRCLE_D = Math.min(CROP_W, CROP_H);
+        const CIRCLE_R = CIRCLE_D / 2;
+
         const modal = document.createElement('div');
         modal.className = 'pp-modal active';
         modal.innerHTML = `
             <p class="pp-label">Arraste e ajuste o zoom para enquadrar</p>
-            <div class="pp-crop-area"></div>
+            <div class="pp-crop-wrapper">
+                <div class="pp-crop-area">
+                    <canvas class="pp-crop-canvas" width="${CROP_W}" height="${CROP_H}"></canvas>
+                    <svg class="pp-circle-overlay" viewBox="0 0 ${CROP_W} ${CROP_H}" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <mask id="pp-circle-mask">
+                                <rect width="${CROP_W}" height="${CROP_H}" fill="white"/>
+                                <circle cx="${CROP_W/2}" cy="${CROP_H/2}" r="${CIRCLE_R - 2}" fill="black"/>
+                            </mask>
+                        </defs>
+                        <rect width="${CROP_W}" height="${CROP_H}" fill="rgba(0,0,0,0.55)" mask="url(#pp-circle-mask)"/>
+                        <circle cx="${CROP_W/2}" cy="${CROP_H/2}" r="${CIRCLE_R - 2}" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2"/>
+                        <circle cx="${CROP_W - 26}" cy="${CROP_H - 26}" r="18" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-dasharray="4,3"/>
+                        <text x="${CROP_W - 26}" y="${CROP_H - 6}" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="7" font-family="monospace">menu</text>
+                    </svg>
+                </div>
+            </div>
             <div class="pp-zoom-container">
                 <button class="pp-zoom-btn" data-dir="out">−</button>
                 <input type="range" class="pp-zoom-slider" min="100" max="300" value="100">
@@ -299,32 +337,46 @@ window.ProfilePicture = {
         document.body.appendChild(modal);
 
         const cropArea = modal.querySelector('.pp-crop-area');
+        const previewCanvas = modal.querySelector('.pp-crop-canvas');
+        const previewCtx = previewCanvas.getContext('2d');
         const slider = modal.querySelector('.pp-zoom-slider');
         const self = this;
 
-        function updatePreview() {
-            const s = self.cropState.scale;
-            cropArea.style.backgroundImage = `url(${dataUrl})`;
-            
-            // Permite dar Zoom in livre, sem que a escala comece gigantesca. Começa com cover.
-            // Para isso, faremos hack: scale=1 significa background-size: cover. Valores > 1 aumentam o background-size em %.
-            if (s <= 1) {
-                cropArea.style.backgroundSize = 'cover';
-            } else {
-                // Baseado num width arbitrário
-                cropArea.style.backgroundSize = `${s * 100}%`;
-            }
-            cropArea.style.backgroundPosition = `${self.cropState.posX}% ${self.cropState.posY}%`;
-        }
-        updatePreview();
+        const img = new Image();
+        img.src = dataUrl;
 
-        // Zoom slider
+        function computeLayout() {
+            const s = self.cropState.scale;
+            const imgW = img.naturalWidth || img.width;
+            const imgH = img.naturalHeight || img.height;
+
+            const coverScale = Math.max(CROP_W / imgW, CROP_H / imgH);
+            const finalScale = coverScale * s;
+            const drawW = imgW * finalScale;
+            const drawH = imgH * finalScale;
+            const offsetX = (CROP_W - drawW) * (self.cropState.posX / 100);
+            const offsetY = (CROP_H - drawH) * (self.cropState.posY / 100);
+
+            return { drawW, drawH, offsetX, offsetY };
+        }
+
+        function updatePreview() {
+            if (!img.complete || !img.naturalWidth) return;
+            const { drawW, drawH, offsetX, offsetY } = computeLayout();
+            previewCtx.clearRect(0, 0, CROP_W, CROP_H);
+            previewCtx.imageSmoothingEnabled = true;
+            previewCtx.imageSmoothingQuality = 'high';
+            previewCtx.drawImage(img, offsetX, offsetY, drawW, drawH);
+        }
+
+        img.onload = () => updatePreview();
+        if (img.complete) updatePreview();
+
         slider.addEventListener('input', (e) => {
             self.cropState.scale = parseInt(e.target.value) / 100;
             updatePreview();
         });
 
-        // Zoom buttons
         modal.querySelectorAll('.pp-zoom-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const dir = btn.dataset.dir;
@@ -337,7 +389,6 @@ window.ProfilePicture = {
             });
         });
 
-        // Drag
         let dragStartX, dragStartY, startPosX, startPosY;
         const onDragStart = (e) => {
             e.preventDefault();
@@ -355,10 +406,17 @@ window.ProfilePicture = {
             e.preventDefault();
             const cx = e.touches ? e.touches[0].clientX : e.clientX;
             const cy = e.touches ? e.touches[0].clientY : e.clientY;
-            const deltaX = (dragStartX - cx) / 2.5;
-            const deltaY = (dragStartY - cy) / 2.5;
-            self.cropState.posX = Math.max(0, Math.min(100, startPosX + deltaX));
-            self.cropState.posY = Math.max(0, Math.min(100, startPosY + deltaY));
+
+            const { drawW, drawH } = computeLayout();
+            const excessW = Math.max(1, drawW - CROP_W);
+            const excessH = Math.max(1, drawH - CROP_H);
+            const deltaXpx = dragStartX - cx;
+            const deltaYpx = dragStartY - cy;
+            const deltaXpct = (deltaXpx / excessW) * 100;
+            const deltaYpct = (deltaYpx / excessH) * 100;
+
+            self.cropState.posX = Math.max(0, Math.min(100, startPosX + deltaXpct));
+            self.cropState.posY = Math.max(0, Math.min(100, startPosY + deltaYpct));
             updatePreview();
         };
         const onDragEnd = () => {
@@ -370,7 +428,6 @@ window.ProfilePicture = {
         cropArea.addEventListener('mousedown', onDragStart);
         cropArea.addEventListener('touchstart', onDragStart, { passive: false });
 
-        // Mouse wheel zoom on crop area
         cropArea.addEventListener('wheel', (e) => {
             e.preventDefault();
             let val = parseInt(slider.value);
@@ -381,7 +438,6 @@ window.ProfilePicture = {
             updatePreview();
         }, { passive: false });
 
-        // Buttons
         modal.querySelector('.pp-btn-cancel').addEventListener('click', () => modal.remove());
 
         modal.querySelector('.pp-btn-swap').addEventListener('click', () => {
@@ -395,42 +451,23 @@ window.ProfilePicture = {
         });
 
         modal.querySelector('.pp-btn-confirm').addEventListener('click', () => {
-            // Render final cropped image mapped to 5:3 ratio with Ultra High Resolution logic
             const finalCanvas = document.createElement('canvas');
-            const targetW = 300;
-            const targetH = 180;
-            finalCanvas.width = targetW;
-            finalCanvas.height = targetH;
+            finalCanvas.width = CROP_W;
+            finalCanvas.height = CROP_H;
             const ctx = finalCanvas.getContext('2d');
-
-            // Smoothing de imagem ultra para garantir que downscale fique bonito
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
-            const img = new Image();
-            img.onload = () => {
-                const s = self.cropState.scale;
-                const drawW = img.width * s;
-                const drawH = img.height * s;
-                // Translate posX/posY (0-100%) to offset proportional to target frame
-                const offsetX = -(drawW - targetW) * (self.cropState.posX / 100);
-                const offsetY = -(drawH - targetH) * (self.cropState.posY / 100);
+            const { drawW, drawH, offsetX, offsetY } = computeLayout();
+            ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
 
-                // Draw directly as rectangle
-                ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
-
-                // Exporta otimizado para Firebase (base64 leve) em WebP com Fallback
-                let croppedData = finalCanvas.toDataURL('image/webp', 0.85);
-                if (croppedData.startsWith('data:image/png')) {
-                    croppedData = finalCanvas.toDataURL('image/jpeg', 0.85);
-                }
-                modal.remove();
-                
-                // Salva ambos: o Recortado Leve (pra carregar rapido no app) 
-                // e o Master HD (pra permitir re-editar o crop depois sem estragar a imagem)
-                self.saveProfile(croppedData, dataUrl);
-            };
-            img.src = dataUrl;
+            let croppedData = finalCanvas.toDataURL('image/webp', 0.85);
+            if (croppedData.startsWith('data:image/png')) {
+                croppedData = finalCanvas.toDataURL('image/jpeg', 0.85);
+            }
+            modal.remove();
+            
+            self.saveProfile(croppedData, dataUrl);
         });
     },
 
@@ -439,7 +476,6 @@ window.ProfilePicture = {
         if (!uid) return;
 
         try {
-            // Se tiver apagando, remove ambos
             const payload = { profileImage: imageData || null };
             if (masterData !== null) {
                 payload.profileImageMaster = masterData;
@@ -458,10 +494,9 @@ window.ProfilePicture = {
                     localStorage.removeItem('user_profile_image');
                 }
 
-                // Atualizar avatar no config (se existir)
                 const configAvatar = document.getElementById('configProfilePic');
                 if (configAvatar) {
-                    configAvatar.dataset.currentImage = imagePath || ''; // Persist state so reopening logic knows the latest image
+                    configAvatar.dataset.currentImage = imagePath || '';
                     if (imagePath) {
                         configAvatar.style.backgroundImage = `url(${imagePath})`;
                         const defaultIcon = configAvatar.querySelector('.pp-default-icon');
@@ -473,7 +508,6 @@ window.ProfilePicture = {
                     }
                 }
 
-                // Atualizar avatar no menu sidebar (se existir)
                 const menuAvatar = document.getElementById('menuProfileBanner');
                 if (menuAvatar) {
                     if (imagePath) {
