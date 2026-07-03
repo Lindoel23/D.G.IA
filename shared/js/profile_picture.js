@@ -315,10 +315,10 @@ window.ProfilePicture = {
                                 <circle cx="${CROP_W/2}" cy="${CROP_H/2}" r="${CIRCLE_R - 2}" fill="black"/>
                             </mask>
                         </defs>
+                        <!-- Escurecimento fora do círculo -->
                         <rect width="${CROP_W}" height="${CROP_H}" fill="rgba(0,0,0,0.55)" mask="url(#pp-circle-mask)"/>
+                        <!-- Borda do círculo principal -->
                         <circle cx="${CROP_W/2}" cy="${CROP_H/2}" r="${CIRCLE_R - 2}" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2"/>
-                        <circle cx="${CROP_W - 26}" cy="${CROP_H - 26}" r="18" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-dasharray="4,3"/>
-                        <text x="${CROP_W - 26}" y="${CROP_H - 6}" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="7" font-family="monospace">menu</text>
                     </svg>
                 </div>
             </div>
